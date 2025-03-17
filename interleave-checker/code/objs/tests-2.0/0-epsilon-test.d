@@ -11,7 +11,7 @@ objs/tests-2.0/0-epsilon-test.o: tests-2.0/0-epsilon-test.c \
  /Users/ryanle/documents/cs140e-25win//libpi/include/rpi-interrupts.h \
  /Users/ryanle/documents/cs140e-25win//libpi/libc/bit-support.h \
  /Users/ryanle/documents/cs140e-25win//libpi/include/rpi-inline-asm.h \
- breakpoint.h
+ breakpoint.h switchto.h
 
 check-interleave.h:
 
@@ -38,3 +38,5 @@ check-interleave.h:
 /Users/ryanle/documents/cs140e-25win//libpi/include/rpi-inline-asm.h:
 
 breakpoint.h:
+
+switchto.h:

@@ -116,9 +116,11 @@ static void B_terminated(uint32_t ret) {
 }
 
 
-
+void context_switch(regs_t *old, regs_t *new);
 void sys_yield() {
-    return;
+    checker_t *c = (checker_t *)checker;
+    c->b_state = 1;
+    context_switch(&c->b_registers, &c->checker_registers);
 }
 
 // 1. adapt `run_A` to create a 2nd thread
@@ -181,7 +183,7 @@ static uint32_t run_A_at_userlevel(checker_t *c) {
 
 // TODO: implement run_B_at_userlevel
 static uint32_t run_B_at_userlevel(checker_t *c) {
-    return;
+    return 0;
 }
 
 

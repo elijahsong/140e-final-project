@@ -7,6 +7,7 @@
 #include "rpi-constants.h"
 #include "cpsr-util.h"
 #include "breakpoint.h"
+#include "switchto.h"
 
 
 // simple debug macro: can turn it off/on by calling <brk_verbose({0,1})>
@@ -89,6 +90,11 @@ typedef struct checker {
 
     // set when we start doing interleave checking.
     unsigned interleaving_p;
+
+    int b_state;  // 1 if yielded
+    regs_t b_registers;
+    regs_t checker_registers;
+
 } checker_t;
 
 // check the routines A and B pointed to in <c>
