@@ -11,7 +11,7 @@ PROGS := tests/2-increment-fail-test.c
 
 # everything [ignore 1]
 PROGS := $(wildcard tests/[023567]*-test.c)
-# PROGS := $(wildcard tests-2.0/[012345]*-test.c)
+PROGS := $(wildcard tests-2.0/[02345]*-test.c)
 
 # simple vacuous test.
 # PROGS := tests/0-epsilon-test.c

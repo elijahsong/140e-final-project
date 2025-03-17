@@ -15,6 +15,7 @@ static volatile checker_t *checker = 0;
 int brk_verbose_p = 0;
 
 static void A_terminated(uint32_t ret);
+static void B_terminated(uint32_t ret);
 
 
 // invoked from user level: 
@@ -70,7 +71,9 @@ static void single_step_handler_full(regs_t *r) {
     // r0 is in r->regs[0], r1 is in r->regs[1], ...
     uint32_t pc = r->regs[15];
     uint32_t n = ++checker->inst_count;
-    
+
+    //TODO: need to utilize checker->interleaving_p
+
     if (n == checker->switch_on_inst_n) {
         if (checker->B((void *)checker) == 1) {
             checker->switched_p = 1;
@@ -107,12 +110,17 @@ static void A_terminated(uint32_t ret) {
     sys_switchto(&start_regs);
 }
 
+// TODO: implement B_terminated
+static void B_terminated(uint32_t ret) {
+    return;
+}
+
+
 
 void sys_yield() {
     return;
 }
 
-// TODO:
 // 1. adapt `run_A` to create a 2nd thread
 // 2. thread queue
 // 3. single step handler: switchto thread (instead of B())
@@ -170,6 +178,12 @@ static uint32_t run_A_at_userlevel(checker_t *c) {
     // 7. return back to the checking loop.
     return start_regs.regs[0];
 }
+
+// TODO: implement run_B_at_userlevel
+static uint32_t run_B_at_userlevel(checker_t *c) {
+    return;
+}
+
 
 // <c> has pointers to four routines:
 //  1. A(), B(): the two routines to check.
