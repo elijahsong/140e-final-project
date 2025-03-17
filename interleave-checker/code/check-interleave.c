@@ -1,3 +1,6 @@
+
+
+
 // engler: starter code for simple A() B() interleaving checker.
 // shows 
 //   1. how to call the routines.
@@ -11,6 +14,11 @@
 
 // used to communicate with the breakpoint handler.
 static volatile checker_t *checker = 0;
+
+// we need a way access the checker on a specific instance
+// while making sure exception handlers have access to original
+// state
+static checker_t *current_checker;
 
 int brk_verbose_p = 0;
 
@@ -85,7 +93,7 @@ static void single_step_handler_full(regs_t *r) {
     }
     // Handle interleaving mode
     else if (checker->interleaving_p) {
-        if (n >= checker->switch_on_inst_n) {
+        if (n == checker->switch_on_inst_n) {
             // Time to try running B
             brkpt_mismatch_stop();
             int ret = run_B_at_userlevel((struct checker *)checker);
@@ -112,8 +120,6 @@ static void single_step_handler_full(regs_t *r) {
 
 // registers saved when we started: recall similar in <rpi-thread.c>
 static regs_t start_regs;
-// static checker_t *current_checker;
-static regs_t current_checker;
 
 // this is called when A() returns: assumes you are at user level.
 // switch back to <start_regs>
@@ -129,8 +135,12 @@ static void A_terminated(uint32_t ret) {
 
 // TODO: implement B_terminated
 static void B_terminated(uint32_t ret) {
-    current_checker.regs[0] = ret;
-    sys_switchto(&current_checker);
+    uint32_t cpsr = mode_get(cpsr_get());
+    if(cpsr != USER_MODE)
+        panic("should be at USER, at <%s> mode\n", mode_str(cpsr));
+
+    current_checker->checker_registers.regs[0] = ret;
+    sys_switchto(&current_checker->checker_registers);
 }
 
 
@@ -219,11 +229,15 @@ static uint32_t run_B_at_userlevel(checker_t *c) {
         .regs[REGS_LR] = (uint32_t)B_terminated,
         };
         c->b_registers = r_B;
+    } else {
+        c->b_state = 0;
     }
-    c->b_state = 0;
-    switchto_cswitch(&current_checker, &c->b_registers);
+    
+    // set current_checker to the upcoming checker (before switch)
+    current_checker = c;
+    switchto_cswitch(&current_checker->checker_registers, &current_checker->b_registers);
 
-    return current_checker.regs[0];
+    return current_checker->checker_registers.regs[0];
 }
 
 
