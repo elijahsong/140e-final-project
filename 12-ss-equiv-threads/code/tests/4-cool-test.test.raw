@@ -1,0 +1,14 @@
+DEBUG:done with options: dev name=</dev/cu.usbserial-210>, pi-prog=<./tests/4-cool-test.bin>, trace=0
+opened tty port </dev/cu.usbserial-210>.
+DEBUG:my-install: tty-usb=</dev/cu.usbserial-210> program=<./tests/4-cool-test.bin>: about to boot
+TRACE:simple_boot: sending 18496 bytes, crc32=d7fec5e3
+BOOT:waiting for a start
+DEBUG:PRINT_STRING:pi sent print: <UART Elijah Song: success: Received the program!>
+BOOT:bootloader: Done.
+ENABLE
+PANIC:./staff-src/default-handler-undefined-inst.c:undefined_instruction_vector:3:unhandled undefined inst exception: pc=0x43ca2adc
+
+DONE!!!
+
+bootloader: pi exited.  cleaning up
+name: /dev/cu.usbserial-210, time: 1739946623
