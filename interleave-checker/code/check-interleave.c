@@ -235,7 +235,9 @@ static uint32_t run_B_at_userlevel(checker_t *c) {
     
     // set current_checker to the upcoming checker (before switch)
     current_checker = c;
-    switchto_cswitch(&current_checker->checker_registers, &current_checker->b_registers);
+
+    // we don't need to the mismatch stuff here
+    switchto_cswitch(&c->checker_registers, &c->b_registers);
 
     return current_checker->checker_registers.regs[0];
 }
