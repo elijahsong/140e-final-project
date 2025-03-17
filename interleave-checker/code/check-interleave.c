@@ -16,6 +16,7 @@ int brk_verbose_p = 0;
 
 static void A_terminated(uint32_t ret);
 static void B_terminated(uint32_t ret);
+static uint32_t run_B_at_userlevel(checker_t *c);
 
 
 // invoked from user level: 
@@ -74,29 +75,45 @@ static void single_step_handler_full(regs_t *r) {
 
     //TODO: need to utilize checker->interleaving_p
 
-    if (n == checker->switch_on_inst_n) {
-        if (checker->B((void *)checker) == 1) {
-            checker->switched_p = 1;
-            switchto(r);
-        } else {
-            ++checker->switch_on_inst_n;
-        }
-    } 
-    
-    if (pc == (uint32_t) A_terminated) {
+    if (pc == (uint32_t)A_terminated) {
         brkpt_mismatch_stop();
+        
+        // If in interleaving mode and B hasn't been called yet, call B
+        if (checker->interleaving_p) {
+            run_B_at_userlevel((struct checker *)checker);
+        }
     }
-    // recall: the weird way single step works: run the instruction 
-    // at address <pc>, by setting up a mismatch fault for any other
-    // <pc> value.
-    brkpt_mismatch_set(pc);
-
-    // switch to back.
+    // Handle interleaving mode
+    else if (checker->interleaving_p) {
+        if (n >= checker->switch_on_inst_n) {
+            // Time to try running B
+            brkpt_mismatch_stop();
+            int ret = run_B_at_userlevel((struct checker *)checker);
+            
+            // If B ran successfully, mark that we switched
+            if (!checker->b_state && ret) {
+                checker->switched_p = 1;
+            } else {
+                // B couldn't run, continue single-stepping A
+                brkpt_mismatch_set(pc);
+            }
+        } else {
+            // Not time to run B yet, continue single-stepping
+            brkpt_mismatch_set(pc);
+        }
+    }
+    // Non-interleaving mode, just continue single-stepping
+    else {
+        brkpt_mismatch_set(pc);
+    }
+    
     switchto(r);
 }
 
 // registers saved when we started: recall similar in <rpi-thread.c>
 static regs_t start_regs;
+// static checker_t *current_checker;
+static regs_t current_checker;
 
 // this is called when A() returns: assumes you are at user level.
 // switch back to <start_regs>
@@ -112,7 +129,8 @@ static void A_terminated(uint32_t ret) {
 
 // TODO: implement B_terminated
 static void B_terminated(uint32_t ret) {
-    return;
+    current_checker.regs[0] = ret;
+    sys_switchto(&current_checker);
 }
 
 
@@ -135,7 +153,6 @@ static uint32_t run_A_at_userlevel(checker_t *c) {
     uint32_t cpsr_cur = cpsr_get();
     assert(mode_get(cpsr_cur) == SUPER_MODE);
     uint32_t cpsr_A = mode_set(cpsr_cur, USER_MODE);
-    uint32_t cpsr_B = mode_set(cpsr_cur, USER_MODE);
 
     // 2. setup the registers.
 
@@ -183,7 +200,30 @@ static uint32_t run_A_at_userlevel(checker_t *c) {
 
 // TODO: implement run_B_at_userlevel
 static uint32_t run_B_at_userlevel(checker_t *c) {
-    return 0;
+    uint32_t cpsr_cur = cpsr_get();
+    assert(mode_get(cpsr_cur) != USER_MODE);
+    uint32_t cpsr_B = mode_set(cpsr_cur, USER_MODE);
+
+    // 2. setup the registers.
+
+    // allocate stack on our main stack.  grows down.
+    enum { N=8192 };
+    uint64_t stack[N];
+
+    if (!c->b_state) {
+        regs_t r_B = { 
+        .regs[REGS_PC] = (uint32_t)c->B,
+        .regs[REGS_R0] = (uint32_t)c,
+        .regs[REGS_SP] = (uint32_t)&stack[N],
+        .regs[REGS_CPSR] = cpsr_B,
+        .regs[REGS_LR] = (uint32_t)B_terminated,
+        };
+        c->b_registers = r_B;
+    }
+    c->b_state = 0;
+    switchto_cswitch(&current_checker, &c->b_registers);
+
+    return current_checker.regs[0];
 }
 
 
@@ -271,6 +311,8 @@ int check(checker_t *c) {
         c->switch_on_inst_n = i;
 
         c->interleaving_p = 1;
+
+        c->b_state = 0;
 
         run_A_at_userlevel(c);
         if(!c->switched_p) // Don't check if we're done
