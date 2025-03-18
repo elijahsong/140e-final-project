@@ -6,6 +6,23 @@
 
 #include "switchto.h"   // needed for <regs_t>
 
+typedef enum {
+    SEQUENTIAL = 0,
+    ROUND_ROBIN = 1,
+    EVERY_X = 2,
+    INTERLEAVE_X = 3,
+    ALL_PATHS = 4,
+    RANDOM = 5
+} Scheduler;
+
+typedef struct config {
+  Scheduler type;
+  // EVERY_X
+  uint32_t switch_on_inst_n;
+  uint32_t random_seed;
+  uint32_t interleave_tid;
+} scheduler_config_t;
+
 typedef struct eqx_th {
     // thread's registers.
     regs_t regs;
@@ -29,6 +46,7 @@ typedef struct eqx_th {
 
     // how many instructions we executed.
     uint32_t inst_cnt;
+    uint32_t cumulative_inst_cnt;
     unsigned verbose_p;  // if you want alot of information.
 } eqx_th_t;
 
@@ -40,6 +58,7 @@ void eqx_init(void);
 //  - returns xor-hash of all hashes.
 uint32_t eqx_run_threads(void);
 
+void set_scheduler_config(scheduler_config_t s);
 
 void eqx_refork(eqx_th_t *th);
 

@@ -22,6 +22,16 @@ void notmain(void) {
     output("about to run %d nop_10 threads\n", N);
     for(int i = 0; i < N; i++)
         eqx_fork_nostack(nop_10, 0, hash);
+    
+    scheduler_config_t s = {
+        .type = INTERLEAVE_X,
+        .switch_on_inst_n = 7,
+        .random_seed = 10,
+        .interleave_tid = 2
+    };
+    set_scheduler_config(s);
+
+
     h = eqx_run_threads();
     assert(h == hash*20);
     trace("done!  ran %d threads, hash=%x\n", N,h);

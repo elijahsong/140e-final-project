@@ -9,7 +9,8 @@
 
 # PROGS += tests/1-mov-test.c
 # PROGS += tests/1-nop1-test.c
-# PROGS += tests/1-nop10-test.c
+PROGS += tests/1-nop10-test.c
+PROGS += tests/1-nop10-test-mod.c
 
 # # very simple tests. start here.
 # PROGS += tests/0-nop1-test.c
@@ -18,9 +19,6 @@
 # PROGS += tests/0-mov-test.c
 
 # we start with this b/c it's cute.
-PROGS = tests/4-cool-test.c
-
-# this is fun to run.
 # PROGS = tests/4-cool-test.c
 
 # COMMON_SRC += breakpoint.c
@@ -29,6 +27,8 @@ PROGS = tests/4-cool-test.c
 # when pass the tests.
 COMMON_SRC += eqx-threads.c
 COMMON_SRC += staff-full-except.c
+
+COMMON_SRC += interleave-checker.c
 
 # this calls staff: replace routines 1 by 1.
 COMMON_SRC += switchto-asm.S

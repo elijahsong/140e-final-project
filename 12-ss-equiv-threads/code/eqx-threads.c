@@ -62,6 +62,13 @@ static eqx_th_t * volatile cur_thread;
 // just like in the interleave lab (10): where we switch back to.
 static regs_t start_regs;
 
+static scheduler_config_t config = {
+    .type = ROUND_ROBIN,
+    .switch_on_inst_n = 0,
+    .random_seed = 10,
+    .interleave_tid = 0
+};
+
 // check that the <sp> stack pointer reg is within 
 // the thread stack.  just die if not.  (should
 // do something else!).
@@ -184,6 +191,7 @@ void eqx_refork(eqx_th_t *th) {
 
     // reset our counts and running hash.
     th->inst_cnt = 0;
+    th->cumulative_inst_cnt = 0;
     th->reg_hash = 0;
 
     eqx_th_push(&eqx_runq, th);
@@ -222,8 +230,54 @@ eqx_schedule(void)
 {
     assert(cur_thread);
 
-    unsigned random = timer_get_usec() % 12;
-    if (!random) {
+    // we should check if we've incremented the number of instructions
+
+    // MODE:
+    // round-robin mode
+    // SIMPLE MODE:
+    // ===========
+    // basically, switch on every n instructions
+    // if we get to n instructions, switch to the next thread
+    // it is the tester's responsibility to set how many instructions we switch on
+
+    // A helper function may be created to run in a loop from i = 1 to n
+    
+    // COMBO MODE:
+    // ===========
+    // run thread 0 for i_0 instructions, run thread 1 for i_1 instructions
+
+    // pruning: if the hash matches a previous state that we've already encountered and finished with, we assume that this path successed. **TODO: how to store this extra state?
+
+    int switch_th = 0; // never switch until completion for config.type == SEQUENTIAL
+    if (config.type == ROUND_ROBIN) {
+        switch_th = 1;
+    } else if (config.type == EVERY_X) {
+        if (cur_thread->inst_cnt >= config.switch_on_inst_n) {
+            switch_th = 1;
+            output("switching at tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
+            cur_thread->inst_cnt = 0;
+        }
+    } else if (config.type == INTERLEAVE_X) {
+        // INTERLEAVE_X_MODE:
+        // ==================
+        // run thread X (the front of the runqueue) for **i** instructions
+        // all other threads run to complete afterwards, ordered within themselves
+        // then, run thread X to completion
+        // if cur_thread->pid == X:
+        //      if cur_thread->cumulative_inst_cnt == i:
+        //          switch to next thread
+        //          put at the end of the queue
+        // if cur_thread->pid != X:
+        //      run to completion
+        // upon completion, a thread AUTOMATICALLY switches to the next one
+
+        if (cur_thread->tid == config.interleave_tid && cur_thread->cumulative_inst_cnt == config.switch_on_inst_n) {
+            output("switching at tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
+            switch_th = 1;
+        }
+    }
+
+    if (switch_th) {
         eqx_th_t *th = eqx_th_pop(&eqx_runq);
         if(th) {
             if(th->verbose_p)
@@ -303,7 +357,8 @@ static void equiv_single_step_handler(regs_t *regs) {
 
     // increment for each instruction.
     th->inst_cnt++;     
-
+    th->cumulative_inst_cnt++;
+    
     // if you need to debug can drop this in to see the values of
     // the registers.
     // reg_dump(th->tid, th->inst_cnt, &th->regs);
@@ -471,4 +526,8 @@ uint32_t eqx_run_threads(void) {
     eqx_trace("done running threads\n");
 
     return exit_hash;
+}
+
+void set_scheduler_config(scheduler_config_t s) {
+    config = s;
 }

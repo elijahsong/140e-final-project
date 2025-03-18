@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.S": "arm",
+        "queue-ext-t.h": "c",
+        "interleave-checker.h": "c"
+    }
+}

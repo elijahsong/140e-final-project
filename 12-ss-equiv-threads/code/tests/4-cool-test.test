@@ -1,1 +1,0 @@
-PANIC:./staff-src/default-handler-undefined-inst.c:undefined_instruction_vector:3:unhandled undefined inst exception: pc=0x43ca2adc
