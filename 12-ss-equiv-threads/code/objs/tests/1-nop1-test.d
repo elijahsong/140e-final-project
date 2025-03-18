@@ -1,4 +1,4 @@
-objs/tests/4-cool-test.o: tests/4-cool-test.c \
+objs/tests/1-nop1-test.o: tests/1-nop1-test.c \
  /Users/ElijahSong/Documents/cs140e-25win//libpi/include/rpi.h \
  /Users/ElijahSong/Documents/cs140e-25win//libpi/libc/demand.h \
  /Users/ElijahSong/Documents/cs140e-25win//libpi/include/gpio.h \

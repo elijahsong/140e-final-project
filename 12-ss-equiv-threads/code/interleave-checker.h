@@ -8,4 +8,13 @@
 #include "cpsr-util.h"
 
 
-int interleave_check(void (*A)(void*), void (*B)(void*), int N, int nbytes, int max_num_inst);
+typedef struct checker_config {
+    void (*A)(void *);
+    void (*B)(void *);
+    int n_copies;
+    int stack_nbytes;
+    int max_num_inst;
+    int verbosity;
+} checker_config_t;
+
+int interleave_check(checker_config_t c);

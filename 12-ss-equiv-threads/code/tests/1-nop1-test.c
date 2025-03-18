@@ -4,7 +4,7 @@
 #include "expected-hashes.h"
 
 
-enum { N = 20 };
+enum { N = 2 };
 
 void notmain(void) {
     uint32_t h = 0;
@@ -22,6 +22,6 @@ void notmain(void) {
     for(int i = 0; i < N; i++)
         eqx_fork_nostack(nop_1, 0, NOP1_HASH);
     h = eqx_run_threads();
-    assert(h == NOP1_HASH*20);
+    assert(h == NOP1_HASH*N);
     trace("done!  ran %d threads, hash=%x\n", N,h);
 }

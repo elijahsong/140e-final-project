@@ -3,6 +3,7 @@
         "*.ejs": "html",
         "*.S": "arm",
         "queue-ext-t.h": "c",
-        "interleave-checker.h": "c"
+        "interleave-checker.h": "c",
+        "full-except.h": "c"
     }
 }

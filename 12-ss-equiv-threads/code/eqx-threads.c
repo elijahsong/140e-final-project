@@ -142,6 +142,7 @@ eqx_fork_stack(void (*fn)(void*), void *arg,
     // we do a dumb monotonic thread id [1,2,...]
     static unsigned ntids = 1;
     th->tid = ntids++;
+    th->verbose_p = verbose_p;
 
     // stack grows down: must be 8-byte aligned.
     th->stack_start = (uint32_t)stack;
@@ -272,9 +273,12 @@ eqx_schedule(void)
         // upon completion, a thread AUTOMATICALLY switches to the next one
 
         if (cur_thread->tid == config.interleave_tid && cur_thread->cumulative_inst_cnt == config.switch_on_inst_n) {
-            output("switching at tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
+            if (verbose_p)
+                output("\tswitching from tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
             switch_th = 1;
-        }
+        } // } else if (cur_thread->tid == config.interleave_tid) {
+        //     output("\tcontinuing from tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
+        // }
     }
 
     if (switch_th) {
@@ -292,6 +296,7 @@ eqx_schedule(void)
             cur_thread = th;
         }
     }
+    // output("run thread: %d with inst_count: %d\n", cur_thread->tid, cur_thread->cumulative_inst_cnt);
     brkpt_run_one_inst(&cur_thread->regs);
 }
 
