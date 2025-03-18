@@ -6,6 +6,7 @@
         "interleave-checker.h": "c",
         "full-except.h": "c",
         "eqx-threads.h": "c",
-        "expected-hashes.h": "c"
+        "expected-hashes.h": "c",
+        "breakpoint.h": "c"
     }
 }

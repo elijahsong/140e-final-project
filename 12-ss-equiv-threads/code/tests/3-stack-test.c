@@ -74,4 +74,13 @@ void notmain(void) {
     eqx_refork(th3);
     eqx_run_threads();
     trace("stack passed!\n");
+
+    output("---------------------------------------------------\n");
+    output("quiet with fork order permuted\n");
+    eqx_verbose(0);
+    eqx_refork(th2);
+    eqx_refork(th1);
+    eqx_refork(th3);
+    eqx_run_threads();
+    trace("stack passed!\n");
 }

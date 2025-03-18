@@ -259,15 +259,7 @@ eqx_schedule(void)
     // pruning: if the hash matches a previous state that we've already encountered and finished with, we assume that this path successed. **TODO: how to store this extra state?
 
     int switch_th = 0; // never switch until completion for config.type == SEQUENTIAL
-    if (config.type == ROUND_ROBIN) {
-        switch_th = 1;
-    } else if (config.type == EVERY_X) {
-        if (cur_thread->inst_cnt >= config.switch_on_inst_n) {
-            switch_th = 1;
-            output("switching at tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
-            cur_thread->inst_cnt = 0;
-        }
-    } else if (config.type == INTERLEAVE_X) {
+    if (config.enable_interleave && cur_thread->tid == config.interleave_tid) {
         // INTERLEAVE_X_MODE:
         // ==================
         // run thread X (the front of the runqueue) for **i** instructions
@@ -281,7 +273,7 @@ eqx_schedule(void)
         //      run to completion
         // upon completion, a thread AUTOMATICALLY switches to the next one
 
-        if (cur_thread->tid == config.interleave_tid && cur_thread->cumulative_inst_cnt == config.switch_on_inst_n) {
+        if (cur_thread->cumulative_inst_cnt == config.switch_on_inst_n) {
             if (verbose_p) {
                 output("switching from tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
             }
@@ -290,12 +282,25 @@ eqx_schedule(void)
         } // } else if (cur_thread->tid == config.interleave_tid) {
         //     output("\tcontinuing from tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
         // }
+    } else {
+        if (config.type == ROUND_ROBIN) {
+            switch_th = 1;
+        } else if (config.type == EVERY_X) {
+            if (cur_thread->inst_cnt >= config.switch_on_inst_n) {
+                switch_th = 1;
+                output("switching at tid=%d, cur_thread->cumulative_inst_cnt %d, switch_on_inst_n %d \n", cur_thread->tid, cur_thread->cumulative_inst_cnt, config.switch_on_inst_n);
+                cur_thread->inst_cnt = 0;
+            }
+        } else if (config.type == RANDOM) {
+            switch_th = timer_get_usec() % config.random_seed ? 1 : 0;
+        }
     }
+
 
     if (switch_th) {
         eqx_th_t *th = eqx_th_pop(&eqx_runq);
         if(th) {
-            if(th->verbose_p)
+            if(th->verbose_p) // TODO: delete this for the demo
                 output("switching from tid=%d,pc=%x to tid=%d,pc=%x,sp=%x\n",
                     cur_thread->tid,
                     cur_thread->regs.regs[REGS_PC],
@@ -377,7 +382,9 @@ static void equiv_single_step_handler(regs_t *regs) {
     
     // if you need to debug can drop this in to see the values of
     // the registers.
-    // reg_dump(th->tid, th->inst_cnt, &th->regs);
+    // if (0) {
+    //     reg_dump(th->tid, th->inst_cnt, &th->regs);
+    // }
 
     uint32_t pc = regs->regs[15];
 
@@ -431,11 +438,11 @@ static int equiv_syscall_handler(regs_t *r) {
     case EQX_SYS_EXIT:
         eqx_trace("thread=%d exited with code=%d, hash=%x\n",
             th->tid, r->regs[1], th->reg_hash);
-        if (th->tid == config.interleave_tid && !thread_x_has_yielded) {
+        if (config.enable_interleave && th->tid == config.interleave_tid && !thread_x_has_yielded) {
             if (verbose_p) output("Interleaved X, tid:%d has not yielded before finishing, n_inst: %d\n\n", th->tid, th->cumulative_inst_cnt);
             complete_x_before_switch = 1;
         }
-        if (th->tid == config.interleave_tid) {
+        if (config.enable_interleave && th->tid == config.interleave_tid) {
             if (verbose_p) output("Interleaved X, tid:%d has yielded before finishing, n_inst: %d\n", th->tid, th->cumulative_inst_cnt);
             thread_x_has_yielded = 1;
         }
@@ -553,6 +560,9 @@ uint32_t eqx_run_threads(void) {
 }
 
 void set_scheduler_config(scheduler_config_t s) {
+    if (s.type == RANDOM) {
+        assert(s.random_seed != 0);
+    }
     config = s;
 }
 

@@ -36,8 +36,15 @@ void notmain(void) {
     output("about to do quiet run\n");
     eqx_verbose(0);
 
+    scheduler_config_t s = {
+        .type = RANDOM,
+        .random_seed = 12
+    };
+    set_scheduler_config(s);
+
     // refork and run all together.
     for(int i = 0; i < N; i++)
         eqx_refork(th[i]);
-    eqx_run_threads();
+    uint32_t h = eqx_run_threads();
+    output("hash is: %x\n", h);
 }

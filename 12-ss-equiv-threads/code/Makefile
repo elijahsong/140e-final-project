@@ -1,21 +1,33 @@
 # "make checkoff" should run a bunch of tests.
 #
+
+
+# Run all new tests
+PROGS := $(wildcard new-tests/[01234567]*.c)
+
+
 # note: 
 #  - the 4,3,2 tests won't work with make check
 #  - but they should pass their internal checks.
 # PROGS = tests/4-cool-test.c
+
 # PROGS = tests/3-stack-test.c
+# PROGS += new-tests/3-stack-interleaved.c
+
 # PROGS = tests/2-no-stack-test.c
+# PROGS += new-tests/2-no-stack-interleaved.c
 
 # PROGS += tests/1-mov-test.c
+# PROGS += new-tests/1-mov-test-mod.c
+
 # PROGS += tests/1-nop1-test.c
-# PROGS += tests/1-nop1-test-mod.c
+# PROGS += new-tests/1-nop1-test-mod.c
 
 # PROGS += tests/1-nop10-test.c
-# PROGS += tests/1-nop10-test-mod.c
+# PROGS += new-tests/1-nop10-test-mod.c
 
-PROGS += tests/2-no-stack-mod.c
-# PROGS += tests/7-mini-test.c
+
+# PROGS += new-tests/2-mini-test.c
 
 # # very simple tests. start here.
 # PROGS += tests/0-nop1-test.c
@@ -71,3 +83,6 @@ include $(CS140E_2025_PATH)/libpi/mk/Makefile.robust
 
 checkoff:
 	make -f ./checkoff.mk
+
+# Added this for randomm support
+LIB_POST += $(CS140E_2025_PATH)/lib/libgcc.a

@@ -1,6 +1,34 @@
 // interleave-checker like lab 10 but using lab 12 code modified
 #include "interleave-checker.h"
 
+void reg_dump(uint32_t tid, uint32_t cnt, regs_t *r, interleave_opt_t opt, int x, uint32_t inst) {
+    if (!opt.interleave_verbosity) return;
+
+    uint32_t pc = r->regs[REGS_PC];
+    uint32_t cpsr = r->regs[REGS_CPSR];
+    output("tid=%d: pc=%x cpsr=%x: for X=%d, inst=%d", 
+        tid, pc, cpsr, x, inst);
+    if(!cnt) {
+        output("  {first instruction}\n");
+        return;
+    }
+
+    int changes = 0;
+    output("\n");
+    for(unsigned i = 0; i<15; i++) {
+        if(r->regs[i]) {
+            output("   r%d=%x, ", i, r->regs[i]);
+            changes++;
+        }
+        if(changes && changes % 4 == 0)
+            output("\n");
+    }
+    if(!changes)
+        output("  {no changes}\n");
+    else if(changes % 4 != 0)
+        output("\n");
+}
+
 // basically: given the inputs from checker and num_copies_B
 // 1. Runs A then B, checking the hash.
 // 2. for (int i = 1; ; i++)
@@ -8,7 +36,7 @@
 //      2.2. verify the hash
 // 3. verify the final hash
 
-int interleave_check(checker_config_t c) {
+int simple_interleave_check(checker_config_t c) {
     uint32_t N = c.n_copies;
     assert(N > 0);
     eqx_init();
@@ -16,6 +44,7 @@ int interleave_check(checker_config_t c) {
     // Run A then B in sequential mode (one after another)
     scheduler_config_t s;
     s.type = SEQUENTIAL;
+    s.enable_interleave = 0;
     set_scheduler_config(s);
     eqx_verbose(c.verbosity);
 
@@ -45,7 +74,8 @@ int interleave_check(checker_config_t c) {
     // output("thread %d is A, tid: %d, h_A: %x\n\n", N, th[N]->tid, h_A);
 
     uint32_t expected_hash = h_A + N * h_B;
-    s.type = INTERLEAVE_X;
+    s.type = SEQUENTIAL;
+    s.enable_interleave = 1;
     s.interleave_tid = th[N]->tid;
 
     // Now, run A for **i** instructions then n copies of B, then finish A.
@@ -81,7 +111,7 @@ int interleave_check(checker_config_t c) {
 static eqx_th_t * 
 run_single(int N, void (*fn)(void*), void *arg, uint32_t hash, int enable_stack) {
     let th = enable_stack ? eqx_fork(fn, arg, hash) : eqx_fork_nostack(fn, arg, hash);
-    th->verbose_p = 1;
+    th->verbose_p = 0;
     eqx_run_threads();
 
     if(hash && th->reg_hash != hash)
@@ -102,27 +132,30 @@ run_single(int N, void (*fn)(void*), void *arg, uint32_t hash, int enable_stack)
     return th;
 }
 
-int interleave_x_with_others(int x, int sequential_hash, void (**funcArr)(void *), void **args, int N, int max_num_inst, int enable_stack) {
+int interleave_x_with_others(int x, int sequential_hash, void (**funcArr)(void *), void **args, int N, interleave_opt_t opt, eqx_th_t **th) {
     assert(x < N);
-    
-    eqx_th_t *th[N];
+    int n_errors = 0;
+    // eqx_th_t *th[N];
 
     // The primary function, aka, the one where we will we run **i** instructions, switch, and then complete
     void (*X)(void *) = funcArr[x];
     void *X_args = args[x];
 
+    // NOTE : Don't fork again (will cause $sp to differ due to stack and checksum to fail)
     // Fork the non-primary functions first
-    for (int i = 0; i < N; ++i) {
-        if (i != x) {
-            th[i] = enable_stack ? eqx_fork(funcArr[i], args[i], 0) : eqx_fork_nostack(funcArr[i], args[i], 0);
-        }
-    }
-    // Fork the primary function last (pushing it to the front of the runqueue)
-    th[x] = enable_stack ? eqx_fork(funcArr[x], args[x], 0) : eqx_fork_nostack(funcArr[x], args[x], 0);
-    eqx_run_threads();
+    // for (int i = 0; i < N; ++i) {
+    //     if (i != x) {
+    //         th[i] = opt.enable_stack ? eqx_fork(funcArr[i], args[i], 0) : eqx_fork_nostack(funcArr[i], args[i], 0);
+    //     }
+    // }
+    // // Fork the primary function last (pushing it to the front of the runqueue)
+    // th[x] = opt.enable_stack ? eqx_fork(funcArr[x], args[x], 0) : eqx_fork_nostack(funcArr[x], args[x], 0);
+    // eqx_run_threads();
 
     scheduler_config_t s;
-    s.type = INTERLEAVE_X;
+    s.type = opt.non_interleave_type; // scheduling strategy used after the primary function X completes i instructions
+    s.random_seed = opt.random_seed;
+    s.enable_interleave = 1;
     s.interleave_tid = th[x]->tid;
     set_scheduler_config(s);
 
@@ -141,31 +174,46 @@ int interleave_x_with_others(int x, int sequential_hash, void (**funcArr)(void *
 
         uint32_t res = eqx_run_threads();
 
-        output("Switch X[idx=%d] on inst %d, hash: %x, expected %x \n", x, i, res, sequential_hash);
-        assert(res == sequential_hash);
+        if (opt.interleave_verbosity)
+            output("Switch X[idx=%d] on inst %d, hash: %x, expected: %x \n", x, i, res, sequential_hash);
+        
+        if (res != sequential_hash) {
+            if (opt.interleave_verbosity) {
+                output("hash=%x does not match expected=%x, on inst %d.\n", res, sequential_hash, i);
+            }
+            ++n_errors;
+        }
 
         if (thread_x_completed_before_yielding()) {
-            output("X[idx=%d] complete with inst:%d\n", x, i);
+            if (opt.enable_fnames)
+                output("f_%d (%s) ran fully to inst: %d\n", x, opt.fnames[x], th[x]->cumulative_inst_cnt);
+            else 
+                output("f_%d ran fully to inst: %d\n", x, th[x]->cumulative_inst_cnt);
+
+            if (opt.interleave_verbosity && res != sequential_hash) {
+                reg_dump(th[x]->tid, th[x]->inst_cnt, &th[x]->regs, opt, x, th[x]->cumulative_inst_cnt);
+            }
             break;
-        } else if (i >= max_num_inst) {
-            output("X[idx=%d] reached max number of inst: %d\n", x, max_num_inst);
+        } else if (i >= opt.max_num_inst) {
+            if (opt.enable_fnames)
+                output("f_%d (%s) reached max number of inst: %d\n", x, opt.fnames[x], opt.max_num_inst);
+            else 
+                output("f_%d reached max number of inst: %d\n", x, opt.max_num_inst);
             break;
         }
     }
-    output("success !!! ran X[idx=%d] interleaved\n\n", x);
-    return 0;
+    return n_errors;
 }
 
-int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, int max_num_inst, int verbosity, int enable_stack) {
-    eqx_init();
-
+// NOTE: Must call eqx_init() before
+int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, interleave_opt_t opt) {
     eqx_th_t *ths[n_fns];
     scheduler_config_t s;
-    eqx_verbose(verbosity);
+    eqx_verbose(opt.verbosity);
 
     // Ensure the hash (seems) determinstic
     for (int i = 0; i < n_fns; ++i) {
-        ths[i] = run_single(3, funcArr[i], args[i], 0, enable_stack);
+        ths[i] = run_single(3, funcArr[i], args[i], 0, opt.enable_stack);
     }
 
     // Run each function in order
@@ -173,16 +221,26 @@ int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, int ma
         eqx_refork(ths[i]);
     }
     s.type = SEQUENTIAL;
+    s.enable_interleave = 0;
     set_scheduler_config(s);
     uint32_t hash = eqx_run_threads();
-    output("Sequential hash: %x\n", hash);
+
+    // if (opt.interleave_verbosity) {
+    //     for (int i = 0; i < n_fns; ++i) {
+    //         reg_dump(ths[0]->tid, ths[i]->inst_cnt, &ths[i]->regs, opt, i, ths[i]->cumulative_inst_cnt);
+    //     }
+    // }
+
+    output("Sequential hash: %x\n\n", hash);
 
     // We will interleave A with B, C, D
     // Then B with A, C, D
     // Then C with A, B, D, etc.    
 
     for (int i = 0; i < n_fns; ++i) {
-        interleave_x_with_others(i, hash, funcArr, args, n_fns, max_num_inst, enable_stack);
+        int n_errors = interleave_x_with_others(i, hash, funcArr, args, n_fns, opt, ths);
+        output("Ran X[idx=%d] interleaved, found %d errors.\n\n", i, n_errors);
     }
+
     return 1;
 }

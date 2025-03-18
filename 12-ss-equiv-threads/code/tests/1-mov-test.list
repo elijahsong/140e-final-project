@@ -1,5 +1,5 @@
 
-objs/tests/1-nop1-test.elf:     file format elf32-littlearm
+objs/tests/1-mov-test.elf:     file format elf32-littlearm
 
 
 Disassembly of section .text:
@@ -136,7 +136,7 @@ Disassembly of section .text:
     81a0:	ea000014 	b	81f8 <notmain+0xa8>
     81a4:	e59f30b8 	ldr	r3, [pc, #184]	; 8264 <notmain+0x114>
     81a8:	e58d3000 	str	r3, [sp]
-    81ac:	e3a03011 	mov	r3, #17, 0
+    81ac:	e3a03012 	mov	r3, #18, 0
     81b0:	e59f20b0 	ldr	r2, [pc, #176]	; 8268 <notmain+0x118>
     81b4:	e59f10b0 	ldr	r1, [pc, #176]	; 826c <notmain+0x11c>
     81b8:	e59f00b0 	ldr	r0, [pc, #176]	; 8270 <notmain+0x120>
@@ -144,7 +144,7 @@ Disassembly of section .text:
     81c0:	eb000c5d 	bl	b33c <clean_reboot>
     81c4:	e59f30a8 	ldr	r3, [pc, #168]	; 8274 <notmain+0x124>
     81c8:	e58d3000 	str	r3, [sp]
-    81cc:	e3a03012 	mov	r3, #18, 0
+    81cc:	e3a03013 	mov	r3, #19, 0
     81d0:	e59f2090 	ldr	r2, [pc, #144]	; 8268 <notmain+0x118>
     81d4:	e59f1090 	ldr	r1, [pc, #144]	; 826c <notmain+0x11c>
     81d8:	e59f0090 	ldr	r0, [pc, #144]	; 8270 <notmain+0x120>
@@ -173,24 +173,24 @@ Disassembly of section .text:
     8234:	e8bd8030 	pop	{r4, r5, pc}
     8238:	e59f3044 	ldr	r3, [pc, #68]	; 8284 <notmain+0x134>
     823c:	e58d3000 	str	r3, [sp]
-    8240:	e3a03019 	mov	r3, #25, 0
+    8240:	e3a0301a 	mov	r3, #26, 0
     8244:	e59f201c 	ldr	r2, [pc, #28]	; 8268 <notmain+0x118>
     8248:	e59f101c 	ldr	r1, [pc, #28]	; 826c <notmain+0x11c>
     824c:	e59f001c 	ldr	r0, [pc, #28]	; 8270 <notmain+0x120>
     8250:	eb000b09 	bl	ae7c <printk>
     8254:	eb000c38 	bl	b33c <clean_reboot>
-    8258:	f7e37b42 	.word	0xf7e37b42
-    825c:	00008038 	.word	0x00008038
-    8260:	0000b8d0 	.word	0x0000b8d0
+    8258:	984d6fbf 	.word	0x984d6fbf
+    825c:	000080a0 	.word	0x000080a0
+    8260:	0000b8c8 	.word	0x0000b8c8
     8264:	0000b8a4 	.word	0x0000b8a4
-    8268:	0000b930 	.word	0x0000b930
+    8268:	0000b924 	.word	0x0000b924
     826c:	0000b860 	.word	0x0000b860
     8270:	0000b874 	.word	0x0000b874
-    8274:	0000b8c0 	.word	0x0000b8c0
-    8278:	5dc5a128 	.word	0x5dc5a128
-    827c:	0000b904 	.word	0x0000b904
-    8280:	0000b910 	.word	0x0000b910
-    8284:	0000b8f0 	.word	0x0000b8f0
+    8274:	0000b8bc 	.word	0x0000b8bc
+    8278:	e60cbaec 	.word	0xe60cbaec
+    827c:	0000b8f8 	.word	0x0000b8f8
+    8280:	0000b904 	.word	0x0000b904
+    8284:	0000b8e8 	.word	0x0000b8e8
 
 00008288 <priv_get_sp_lr_asm>:
     8288:	e10f4000 	mrs	r4, CPSR
@@ -472,10 +472,10 @@ Disassembly of section .text:
     8674:	e59f0010 	ldr	r0, [pc, #16]	; 868c <eqx_check_sp+0x7c>
     8678:	eb0009ff 	bl	ae7c <printk>
     867c:	eb000b2e 	bl	b33c <clean_reboot>
-    8680:	0000bf7c 	.word	0x0000bf7c
-    8684:	0000b938 	.word	0x0000b938
-    8688:	0000b948 	.word	0x0000b948
-    868c:	0000b984 	.word	0x0000b984
+    8680:	0000bf70 	.word	0x0000bf70
+    8684:	0000b92c 	.word	0x0000b92c
+    8688:	0000b93c 	.word	0x0000b93c
+    868c:	0000b978 	.word	0x0000b978
 
 00008690 <eqx_th_pop>:
     8690:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -525,15 +525,15 @@ Disassembly of section .text:
     8740:	eb000afd 	bl	b33c <clean_reboot>
     8744:	e5832004 	str	r2, [r3, #4]
     8748:	eaffffdb 	b	86bc <eqx_th_pop+0x2c>
-    874c:	0000b9f4 	.word	0x0000b9f4
-    8750:	0000bf8c 	.word	0x0000bf8c
-    8754:	0000b938 	.word	0x0000b938
-    8758:	0000b9c0 	.word	0x0000b9c0
-    875c:	0000ba38 	.word	0x0000ba38
+    874c:	0000b9e8 	.word	0x0000b9e8
+    8750:	0000bf80 	.word	0x0000bf80
+    8754:	0000b92c 	.word	0x0000b92c
+    8758:	0000b9b4 	.word	0x0000b9b4
+    875c:	0000ba2c 	.word	0x0000ba2c
     8760:	0000b874 	.word	0x0000b874
-    8764:	0000ba2c 	.word	0x0000ba2c
-    8768:	0000bf98 	.word	0x0000bf98
-    876c:	0000b9f8 	.word	0x0000b9f8
+    8764:	0000ba20 	.word	0x0000ba20
+    8768:	0000bf8c 	.word	0x0000bf8c
+    876c:	0000b9ec 	.word	0x0000b9ec
 
 00008770 <mode_get>:
     8770:	e200001f 	and	r0, r0, #31, 0
@@ -556,9 +556,9 @@ Disassembly of section .text:
     87b4:	e59f000c 	ldr	r0, [pc, #12]	; 87c8 <mode_get+0x58>
     87b8:	eb0009af 	bl	ae7c <printk>
     87bc:	eb000ade 	bl	b33c <clean_reboot>
-    87c0:	0000bfa8 	.word	0x0000bfa8
-    87c4:	0000ba48 	.word	0x0000ba48
-    87c8:	0000ba8c 	.word	0x0000ba8c
+    87c0:	0000bf9c 	.word	0x0000bf9c
+    87c4:	0000ba3c 	.word	0x0000ba3c
+    87c8:	0000ba80 	.word	0x0000ba80
 
 000087cc <switchto>:
     87cc:	e92d4010 	push	{r4, lr}
@@ -703,16 +703,16 @@ Disassembly of section .text:
     89e8:	e582300c 	str	r3, [r2, #12]
     89ec:	e5823008 	str	r3, [r2, #8]
     89f0:	eaffffe9 	b	899c <eqx_schedule+0x184>
-    89f4:	0000cf34 	.word	0x0000cf34
-    89f8:	0000cf14 	.word	0x0000cf14
-    89fc:	0000bab8 	.word	0x0000bab8
-    8a00:	0000bfb4 	.word	0x0000bfb4
-    8a04:	0000b938 	.word	0x0000b938
+    89f4:	0000cf28 	.word	0x0000cf28
+    89f8:	0000cf08 	.word	0x0000cf08
+    89fc:	0000baac 	.word	0x0000baac
+    8a00:	0000bfa8 	.word	0x0000bfa8
+    8a04:	0000b92c 	.word	0x0000b92c
     8a08:	0000b874 	.word	0x0000b874
-    8a0c:	0000bac4 	.word	0x0000bac4
-    8a10:	0000bb18 	.word	0x0000bb18
-    8a14:	0000cf3c 	.word	0x0000cf3c
-    8a18:	0000bb68 	.word	0x0000bb68
+    8a0c:	0000bab8 	.word	0x0000bab8
+    8a10:	0000bb0c 	.word	0x0000bb0c
+    8a14:	0000cf30 	.word	0x0000cf30
+    8a18:	0000bb5c 	.word	0x0000bb5c
 
 00008a1c <equiv_single_step_handler>:
     8a1c:	e92d4010 	push	{r4, lr}
@@ -800,14 +800,14 @@ Disassembly of section .text:
     8b64:	e59f0020 	ldr	r0, [pc, #32]	; 8b8c <equiv_single_step_handler+0x170>
     8b68:	eb0008c3 	bl	ae7c <printk>
     8b6c:	eafffff2 	b	8b3c <equiv_single_step_handler+0x120>
-    8b70:	0000cf34 	.word	0x0000cf34
+    8b70:	0000cf28 	.word	0x0000cf28
     8b74:	00000171 	.word	0x00000171
-    8b78:	0000bfc4 	.word	0x0000bfc4
-    8b7c:	0000b938 	.word	0x0000b938
-    8b80:	0000bb9c 	.word	0x0000bb9c
-    8b84:	0000bbd4 	.word	0x0000bbd4
+    8b78:	0000bfb8 	.word	0x0000bfb8
+    8b7c:	0000b92c 	.word	0x0000b92c
+    8b80:	0000bb90 	.word	0x0000bb90
+    8b84:	0000bbc8 	.word	0x0000bbc8
     8b88:	0000b874 	.word	0x0000b874
-    8b8c:	0000bbd8 	.word	0x0000bbd8
+    8b8c:	0000bbcc 	.word	0x0000bbcc
 
 00008b90 <equiv_syscall_handler>:
     8b90:	e92d4070 	push	{r4, r5, r6, lr}
@@ -1018,28 +1018,28 @@ Disassembly of section .text:
     8ec4:	eb00091c 	bl	b33c <clean_reboot>
     8ec8:	e3a05000 	mov	r5, #0, 0
     8ecc:	eafffff4 	b	8ea4 <equiv_syscall_handler+0x314>
-    8ed0:	0000bc00 	.word	0x0000bc00
+    8ed0:	0000bbf4 	.word	0x0000bbf4
     8ed4:	000001a3 	.word	0x000001a3
-    8ed8:	0000bfe0 	.word	0x0000bfe0
-    8edc:	0000b938 	.word	0x0000b938
+    8ed8:	0000bfd4 	.word	0x0000bfd4
+    8edc:	0000b92c 	.word	0x0000b92c
     8ee0:	0000b874 	.word	0x0000b874
-    8ee4:	0000cf34 	.word	0x0000cf34
-    8ee8:	0000bc1c 	.word	0x0000bc1c
+    8ee4:	0000cf28 	.word	0x0000cf28
+    8ee8:	0000bc10 	.word	0x0000bc10
     8eec:	000001a5 	.word	0x000001a5
-    8ef0:	0000bbd4 	.word	0x0000bbd4
-    8ef4:	0000cf14 	.word	0x0000cf14
-    8ef8:	0000b904 	.word	0x0000b904
-    8efc:	0000bc38 	.word	0x0000bc38
-    8f00:	0000bc60 	.word	0x0000bc60
-    8f04:	0000bca8 	.word	0x0000bca8
-    8f08:	0000bce8 	.word	0x0000bce8
+    8ef0:	0000bbc8 	.word	0x0000bbc8
+    8ef4:	0000cf08 	.word	0x0000cf08
+    8ef8:	0000b8f8 	.word	0x0000b8f8
+    8efc:	0000bc2c 	.word	0x0000bc2c
+    8f00:	0000bc54 	.word	0x0000bc54
+    8f04:	0000bc9c 	.word	0x0000bc9c
+    8f08:	0000bcdc 	.word	0x0000bcdc
     8f0c:	000001ce 	.word	0x000001ce
-    8f10:	0000bd0c 	.word	0x0000bd0c
-    8f14:	0000cf4c 	.word	0x0000cf4c
-    8f18:	0000bd50 	.word	0x0000bd50
-    8f1c:	0000bd68 	.word	0x0000bd68
+    8f10:	0000bd00 	.word	0x0000bd00
+    8f14:	0000cf40 	.word	0x0000cf40
+    8f18:	0000bd44 	.word	0x0000bd44
+    8f1c:	0000bd5c 	.word	0x0000bd5c
     8f20:	000001e5 	.word	0x000001e5
-    8f24:	0000bd78 	.word	0x0000bd78
+    8f24:	0000bd6c 	.word	0x0000bd6c
 
 00008f28 <eqx_regs_init>:
     8f28:	e92d4030 	push	{r4, r5, lr}
@@ -1079,15 +1079,15 @@ Disassembly of section .text:
     8fb0:	eb0007b1 	bl	ae7c <printk>
     8fb4:	eb0008e0 	bl	b33c <clean_reboot>
     8fb8:	00008120 	.word	0x00008120
-    8fbc:	0000bff8 	.word	0x0000bff8
-    8fc0:	0000b938 	.word	0x0000b938
-    8fc4:	0000bda4 	.word	0x0000bda4
+    8fbc:	0000bfec 	.word	0x0000bfec
+    8fc0:	0000b92c 	.word	0x0000b92c
+    8fc4:	0000bd98 	.word	0x0000bd98
 
 00008fc8 <eqx_verbose>:
     8fc8:	e59f3004 	ldr	r3, [pc, #4]	; 8fd4 <eqx_verbose+0xc>
     8fcc:	e5830014 	str	r0, [r3, #20]
     8fd0:	e12fff1e 	bx	lr
-    8fd4:	0000cf14 	.word	0x0000cf14
+    8fd4:	0000cf08 	.word	0x0000cf08
 
 00008fd8 <eqx_fork_stack>:
     8fd8:	e92d41f0 	push	{r4, r5, r6, r7, r8, lr}
@@ -1136,11 +1136,11 @@ Disassembly of section .text:
     9084:	e59f3008 	ldr	r3, [pc, #8]	; 9094 <eqx_fork_stack+0xbc>
     9088:	e583400c 	str	r4, [r3, #12]
     908c:	eafffff2 	b	905c <eqx_fork_stack+0x84>
-    9090:	0000cf14 	.word	0x0000cf14
-    9094:	0000cf34 	.word	0x0000cf34
-    9098:	0000c008 	.word	0x0000c008
-    909c:	0000b938 	.word	0x0000b938
-    90a0:	0000bdd0 	.word	0x0000bdd0
+    9090:	0000cf08 	.word	0x0000cf08
+    9094:	0000cf28 	.word	0x0000cf28
+    9098:	0000bffc 	.word	0x0000bffc
+    909c:	0000b92c 	.word	0x0000b92c
+    90a0:	0000bdc4 	.word	0x0000bdc4
 
 000090a4 <eqx_fork>:
     90a4:	e92d4070 	push	{r4, r5, r6, lr}
@@ -1170,9 +1170,9 @@ Disassembly of section .text:
     9104:	e59f0010 	ldr	r0, [pc, #16]	; 911c <eqx_fork+0x78>
     9108:	eb00075b 	bl	ae7c <printk>
     910c:	eb00088a 	bl	b33c <clean_reboot>
-    9110:	0000be0c 	.word	0x0000be0c
-    9114:	0000c018 	.word	0x0000c018
-    9118:	0000b938 	.word	0x0000b938
+    9110:	0000be00 	.word	0x0000be00
+    9114:	0000c00c 	.word	0x0000c00c
+    9118:	0000b92c 	.word	0x0000b92c
     911c:	0000b874 	.word	0x0000b874
 
 00009120 <eqx_fork_nostack>:
@@ -1218,10 +1218,10 @@ Disassembly of section .text:
     91b4:	e59f3004 	ldr	r3, [pc, #4]	; 91c0 <eqx_refork+0x84>
     91b8:	e583400c 	str	r4, [r3, #12]
     91bc:	eafffff2 	b	918c <eqx_refork+0x50>
-    91c0:	0000cf34 	.word	0x0000cf34
-    91c4:	0000be24 	.word	0x0000be24
-    91c8:	0000c024 	.word	0x0000c024
-    91cc:	0000b938 	.word	0x0000b938
+    91c0:	0000cf28 	.word	0x0000cf28
+    91c4:	0000be18 	.word	0x0000be18
+    91c8:	0000c018 	.word	0x0000c018
+    91cc:	0000b92c 	.word	0x0000b92c
     91d0:	0000b874 	.word	0x0000b874
 
 000091d4 <eqx_init>:
@@ -1253,12 +1253,12 @@ Disassembly of section .text:
     9238:	e1a00001 	mov	r0, r1
     923c:	eb00054a 	bl	a76c <kmalloc_init_set_start>
     9240:	eaffffee 	b	9200 <eqx_init+0x2c>
-    9244:	0000cf34 	.word	0x0000cf34
+    9244:	0000cf28 	.word	0x0000cf28
     9248:	00008a1c 	.word	0x00008a1c
     924c:	00008b90 	.word	0x00008b90
-    9250:	0000c030 	.word	0x0000c030
-    9254:	0000b938 	.word	0x0000b938
-    9258:	0000be38 	.word	0x0000be38
+    9250:	0000c024 	.word	0x0000c024
+    9254:	0000b92c 	.word	0x0000b92c
+    9258:	0000be2c 	.word	0x0000be2c
 
 0000925c <eqx_run_threads>:
     925c:	e92d4010 	push	{r4, lr}
@@ -1479,35 +1479,35 @@ Disassembly of section .text:
     95b8:	e59f0074 	ldr	r0, [pc, #116]	; 9634 <eqx_run_threads+0x3d8>
     95bc:	eb00062e 	bl	ae7c <printk>
     95c0:	eaffff78 	b	93a8 <eqx_run_threads+0x14c>
-    95c4:	0000cf34 	.word	0x0000cf34
-    95c8:	0000cf14 	.word	0x0000cf14
+    95c4:	0000cf28 	.word	0x0000cf28
+    95c8:	0000cf08 	.word	0x0000cf08
     95cc:	0000020b 	.word	0x0000020b
-    95d0:	0000c03c 	.word	0x0000c03c
-    95d4:	0000b938 	.word	0x0000b938
-    95d8:	0000be5c 	.word	0x0000be5c
-    95dc:	0000ba38 	.word	0x0000ba38
-    95e0:	0000bf8c 	.word	0x0000bf8c
+    95d0:	0000c030 	.word	0x0000c030
+    95d4:	0000b92c 	.word	0x0000b92c
+    95d8:	0000be50 	.word	0x0000be50
+    95dc:	0000ba2c 	.word	0x0000ba2c
+    95e0:	0000bf80 	.word	0x0000bf80
     95e4:	0000b874 	.word	0x0000b874
-    95e8:	0000ba2c 	.word	0x0000ba2c
-    95ec:	0000bf98 	.word	0x0000bf98
-    95f0:	0000b9f8 	.word	0x0000b9f8
+    95e8:	0000ba20 	.word	0x0000ba20
+    95ec:	0000bf8c 	.word	0x0000bf8c
+    95f0:	0000b9ec 	.word	0x0000b9ec
     95f4:	00000212 	.word	0x00000212
-    95f8:	0000be88 	.word	0x0000be88
-    95fc:	0000bfa8 	.word	0x0000bfa8
-    9600:	0000ba48 	.word	0x0000ba48
-    9604:	0000ba8c 	.word	0x0000ba8c
-    9608:	0000beb8 	.word	0x0000beb8
-    960c:	0000c04c 	.word	0x0000c04c
-    9610:	0000beac 	.word	0x0000beac
-    9614:	0000bedc 	.word	0x0000bedc
+    95f8:	0000be7c 	.word	0x0000be7c
+    95fc:	0000bf9c 	.word	0x0000bf9c
+    9600:	0000ba3c 	.word	0x0000ba3c
+    9604:	0000ba80 	.word	0x0000ba80
+    9608:	0000beac 	.word	0x0000beac
+    960c:	0000c040 	.word	0x0000c040
+    9610:	0000bea0 	.word	0x0000bea0
+    9614:	0000bed0 	.word	0x0000bed0
     9618:	00000226 	.word	0x00000226
-    961c:	0000bf04 	.word	0x0000bf04
-    9620:	0000bf30 	.word	0x0000bf30
+    961c:	0000bef8 	.word	0x0000bef8
+    9620:	0000bf24 	.word	0x0000bf24
     9624:	00000229 	.word	0x00000229
-    9628:	0000bf40 	.word	0x0000bf40
+    9628:	0000bf34 	.word	0x0000bf34
     962c:	0000022a 	.word	0x0000022a
-    9630:	0000b904 	.word	0x0000b904
-    9634:	0000bf50 	.word	0x0000bf50
+    9630:	0000b8f8 	.word	0x0000b8f8
+    9634:	0000bf44 	.word	0x0000bf44
 
 00009638 <set_scheduler_config>:
     9638:	e24dd010 	sub	sp, sp, #16, 0
@@ -1539,11 +1539,11 @@ Disassembly of section .text:
     96a0:	e59f0018 	ldr	r0, [pc, #24]	; 96c0 <set_scheduler_config+0x88>
     96a4:	eb0005f4 	bl	ae7c <printk>
     96a8:	eb000723 	bl	b33c <clean_reboot>
-    96ac:	0000cf14 	.word	0x0000cf14
-    96b0:	0000bf68 	.word	0x0000bf68
+    96ac:	0000cf08 	.word	0x0000cf08
+    96b0:	0000bf5c 	.word	0x0000bf5c
     96b4:	00000233 	.word	0x00000233
-    96b8:	0000c060 	.word	0x0000c060
-    96bc:	0000b938 	.word	0x0000b938
+    96b8:	0000c054 	.word	0x0000c054
+    96bc:	0000b92c 	.word	0x0000b92c
     96c0:	0000b874 	.word	0x0000b874
 
 000096c4 <thread_x_completed_before_yielding>:
@@ -1577,13 +1577,13 @@ Disassembly of section .text:
     9730:	e59f0018 	ldr	r0, [pc, #24]	; 9750 <thread_x_completed_before_yielding+0x8c>
     9734:	eb0005d0 	bl	ae7c <printk>
     9738:	eb0006ff 	bl	b33c <clean_reboot>
-    973c:	0000cf34 	.word	0x0000cf34
-    9740:	0000bf30 	.word	0x0000bf30
+    973c:	0000cf28 	.word	0x0000cf28
+    9740:	0000bf24 	.word	0x0000bf24
     9744:	00000239 	.word	0x00000239
-    9748:	0000c078 	.word	0x0000c078
-    974c:	0000b938 	.word	0x0000b938
+    9748:	0000c06c 	.word	0x0000c06c
+    974c:	0000b92c 	.word	0x0000b92c
     9750:	0000b874 	.word	0x0000b874
-    9754:	0000bf40 	.word	0x0000bf40
+    9754:	0000bf34 	.word	0x0000bf34
     9758:	0000023a 	.word	0x0000023a
 
 0000975c <mode_get>:
@@ -1607,9 +1607,9 @@ Disassembly of section .text:
     97a0:	e59f000c 	ldr	r0, [pc, #12]	; 97b4 <mode_get+0x58>
     97a4:	eb0005b4 	bl	ae7c <printk>
     97a8:	eb0006e3 	bl	b33c <clean_reboot>
-    97ac:	0000c32c 	.word	0x0000c32c
-    97b0:	0000ba48 	.word	0x0000ba48
-    97b4:	0000ba8c 	.word	0x0000ba8c
+    97ac:	0000c320 	.word	0x0000c320
+    97b0:	0000ba3c 	.word	0x0000ba3c
+    97b4:	0000ba80 	.word	0x0000ba80
 
 000097b8 <switchto>:
     97b8:	e92d4010 	push	{r4, lr}
@@ -1675,13 +1675,13 @@ Disassembly of section .text:
     98a0:	e59f001c 	ldr	r0, [pc, #28]	; 98c4 <prefetch_abort_full_except+0xe4>
     98a4:	eb000574 	bl	ae7c <printk>
     98a8:	eb0006a3 	bl	b33c <clean_reboot>
-    98ac:	0000cf94 	.word	0x0000cf94
-    98b0:	0000c0b0 	.word	0x0000c0b0
-    98b4:	0000c338 	.word	0x0000c338
-    98b8:	0000c09c 	.word	0x0000c09c
+    98ac:	0000cf88 	.word	0x0000cf88
+    98b0:	0000c0a4 	.word	0x0000c0a4
+    98b4:	0000c32c 	.word	0x0000c32c
+    98b8:	0000c090 	.word	0x0000c090
     98bc:	0000b874 	.word	0x0000b874
-    98c0:	0000c0cc 	.word	0x0000c0cc
-    98c4:	0000c0e4 	.word	0x0000c0e4
+    98c0:	0000c0c0 	.word	0x0000c0c0
+    98c4:	0000c0d8 	.word	0x0000c0d8
 
 000098c8 <data_abort_full_except>:
     98c8:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -1735,13 +1735,13 @@ Disassembly of section .text:
     9988:	e59f001c 	ldr	r0, [pc, #28]	; 99ac <data_abort_full_except+0xe4>
     998c:	eb00053a 	bl	ae7c <printk>
     9990:	eb000669 	bl	b33c <clean_reboot>
-    9994:	0000cf94 	.word	0x0000cf94
-    9998:	0000c0b0 	.word	0x0000c0b0
-    999c:	0000c354 	.word	0x0000c354
-    99a0:	0000c09c 	.word	0x0000c09c
+    9994:	0000cf88 	.word	0x0000cf88
+    9998:	0000c0a4 	.word	0x0000c0a4
+    999c:	0000c348 	.word	0x0000c348
+    99a0:	0000c090 	.word	0x0000c090
     99a4:	0000b874 	.word	0x0000b874
-    99a8:	0000c0cc 	.word	0x0000c0cc
-    99ac:	0000c11c 	.word	0x0000c11c
+    99a8:	0000c0c0 	.word	0x0000c0c0
+    99ac:	0000c110 	.word	0x0000c110
 
 000099b0 <syscall_full_except>:
     99b0:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -1808,17 +1808,17 @@ Disassembly of section .text:
     9aa4:	e59f002c 	ldr	r0, [pc, #44]	; 9ad8 <syscall_full_except+0x128>
     9aa8:	eb0004f3 	bl	ae7c <printk>
     9aac:	eb000622 	bl	b33c <clean_reboot>
-    9ab0:	0000c0cc 	.word	0x0000c0cc
-    9ab4:	0000c36c 	.word	0x0000c36c
-    9ab8:	0000c09c 	.word	0x0000c09c
+    9ab0:	0000c0c0 	.word	0x0000c0c0
+    9ab4:	0000c360 	.word	0x0000c360
+    9ab8:	0000c090 	.word	0x0000c090
     9abc:	0000b874 	.word	0x0000b874
-    9ac0:	0000c0b0 	.word	0x0000c0b0
+    9ac0:	0000c0a4 	.word	0x0000c0a4
     9ac4:	000186a0 	.word	0x000186a0
-    9ac8:	0000cf94 	.word	0x0000cf94
-    9acc:	0000c150 	.word	0x0000c150
-    9ad0:	0000c1d0 	.word	0x0000c1d0
-    9ad4:	0000c18c 	.word	0x0000c18c
-    9ad8:	0000c1e8 	.word	0x0000c1e8
+    9ac8:	0000cf88 	.word	0x0000cf88
+    9acc:	0000c144 	.word	0x0000c144
+    9ad0:	0000c1c4 	.word	0x0000c1c4
+    9ad4:	0000c180 	.word	0x0000c180
+    9ad8:	0000c1dc 	.word	0x0000c1dc
 
 00009adc <full_except_set_prefetch>:
     9adc:	e59f300c 	ldr	r3, [pc, #12]	; 9af0 <full_except_set_prefetch+0x14>
@@ -1826,7 +1826,7 @@ Disassembly of section .text:
     9ae4:	e5830000 	str	r0, [r3]
     9ae8:	e1a00002 	mov	r0, r2
     9aec:	e12fff1e 	bx	lr
-    9af0:	0000cf94 	.word	0x0000cf94
+    9af0:	0000cf88 	.word	0x0000cf88
 
 00009af4 <full_except_set_data_abort>:
     9af4:	e59f300c 	ldr	r3, [pc, #12]	; 9b08 <full_except_set_data_abort+0x14>
@@ -1834,7 +1834,7 @@ Disassembly of section .text:
     9afc:	e5830004 	str	r0, [r3, #4]
     9b00:	e1a00002 	mov	r0, r2
     9b04:	e12fff1e 	bx	lr
-    9b08:	0000cf94 	.word	0x0000cf94
+    9b08:	0000cf88 	.word	0x0000cf88
 
 00009b0c <full_except_set_syscall>:
     9b0c:	e59f300c 	ldr	r3, [pc, #12]	; 9b20 <full_except_set_syscall+0x14>
@@ -1842,7 +1842,7 @@ Disassembly of section .text:
     9b14:	e5830008 	str	r0, [r3, #8]
     9b18:	e1a00002 	mov	r0, r2
     9b1c:	e12fff1e 	bx	lr
-    9b20:	0000cf94 	.word	0x0000cf94
+    9b20:	0000cf88 	.word	0x0000cf88
 
 00009b24 <full_except_install>:
     9b24:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -1941,14 +1941,14 @@ Disassembly of section .text:
     9c98:	eb000477 	bl	ae7c <printk>
     9c9c:	eb0005a6 	bl	b33c <clean_reboot>
     9ca0:	000085a0 	.word	0x000085a0
-    9ca4:	0000c380 	.word	0x0000c380
-    9ca8:	0000c218 	.word	0x0000c218
-    9cac:	0000c2bc 	.word	0x0000c2bc
-    9cb0:	0000c25c 	.word	0x0000c25c
-    9cb4:	0000c284 	.word	0x0000c284
-    9cb8:	0000c390 	.word	0x0000c390
-    9cbc:	0000c09c 	.word	0x0000c09c
-    9cc0:	0000c2e8 	.word	0x0000c2e8
+    9ca4:	0000c374 	.word	0x0000c374
+    9ca8:	0000c20c 	.word	0x0000c20c
+    9cac:	0000c2b0 	.word	0x0000c2b0
+    9cb0:	0000c250 	.word	0x0000c250
+    9cb4:	0000c278 	.word	0x0000c278
+    9cb8:	0000c384 	.word	0x0000c384
+    9cbc:	0000c090 	.word	0x0000c090
+    9cc0:	0000c2dc 	.word	0x0000c2dc
 
 00009cc4 <run_single>:
     9cc4:	e92d41f0 	push	{r4, r5, r6, r7, r8, lr}
@@ -2012,12 +2012,12 @@ Disassembly of section .text:
     9dac:	eb000562 	bl	b33c <clean_reboot>
     9db0:	e1a00005 	mov	r0, r5
     9db4:	e8bd81f0 	pop	{r4, r5, r6, r7, r8, pc}
-    9db8:	0000c63c 	.word	0x0000c63c
-    9dbc:	0000b904 	.word	0x0000b904
-    9dc0:	0000c3fc 	.word	0x0000c3fc
-    9dc4:	0000c42c 	.word	0x0000c42c
-    9dc8:	0000c3a4 	.word	0x0000c3a4
-    9dcc:	0000c3bc 	.word	0x0000c3bc
+    9db8:	0000c630 	.word	0x0000c630
+    9dbc:	0000b8f8 	.word	0x0000b8f8
+    9dc0:	0000c3f0 	.word	0x0000c3f0
+    9dc4:	0000c420 	.word	0x0000c420
+    9dc8:	0000c398 	.word	0x0000c398
+    9dcc:	0000c3b0 	.word	0x0000c3b0
 
 00009dd0 <simple_interleave_check>:
     9dd0:	e24dd010 	sub	sp, sp, #16, 0
@@ -2176,16 +2176,16 @@ Disassembly of section .text:
     a034:	e8bd4ff0 	pop	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
     a038:	e28dd010 	add	sp, sp, #16, 0
     a03c:	e12fff1e 	bx	lr
-    a040:	0000c464 	.word	0x0000c464
-    a044:	0000c498 	.word	0x0000c498
-    a048:	0000c45c 	.word	0x0000c45c
-    a04c:	0000c648 	.word	0x0000c648
-    a050:	0000c3a4 	.word	0x0000c3a4
+    a040:	0000c458 	.word	0x0000c458
+    a044:	0000c48c 	.word	0x0000c48c
+    a048:	0000c450 	.word	0x0000c450
+    a04c:	0000c63c 	.word	0x0000c63c
+    a050:	0000c398 	.word	0x0000c398
     a054:	0000b874 	.word	0x0000b874
-    a058:	0000c4bc 	.word	0x0000c4bc
-    a05c:	0000c4ec 	.word	0x0000c4ec
-    a060:	0000c504 	.word	0x0000c504
-    a064:	0000c520 	.word	0x0000c520
+    a058:	0000c4b0 	.word	0x0000c4b0
+    a05c:	0000c4e0 	.word	0x0000c4e0
+    a060:	0000c4f8 	.word	0x0000c4f8
+    a064:	0000c514 	.word	0x0000c514
 
 0000a068 <interleave_x_with_others>:
     a068:	e92d4ff0 	push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -2316,15 +2316,15 @@ Disassembly of section .text:
     a25c:	e59f0024 	ldr	r0, [pc, #36]	; a288 <interleave_x_with_others+0x220>
     a260:	eb000305 	bl	ae7c <printk>
     a264:	eafffff5 	b	a240 <interleave_x_with_others+0x1d8>
-    a268:	0000c554 	.word	0x0000c554
-    a26c:	0000c660 	.word	0x0000c660
-    a270:	0000c3a4 	.word	0x0000c3a4
+    a268:	0000c548 	.word	0x0000c548
+    a26c:	0000c654 	.word	0x0000c654
+    a270:	0000c398 	.word	0x0000c398
     a274:	0000b874 	.word	0x0000b874
-    a278:	0000c55c 	.word	0x0000c55c
-    a27c:	0000c594 	.word	0x0000c594
-    a280:	0000c5ac 	.word	0x0000c5ac
-    a284:	0000c5fc 	.word	0x0000c5fc
-    a288:	0000c5d0 	.word	0x0000c5d0
+    a278:	0000c550 	.word	0x0000c550
+    a27c:	0000c588 	.word	0x0000c588
+    a280:	0000c5a0 	.word	0x0000c5a0
+    a284:	0000c5f0 	.word	0x0000c5f0
+    a288:	0000c5c4 	.word	0x0000c5c4
 
 0000a28c <interleave_multiple>:
     a28c:	e24dd008 	sub	sp, sp, #8, 0
@@ -2397,7 +2397,7 @@ Disassembly of section .text:
     a398:	e8bd49f0 	pop	{r4, r5, r6, r7, r8, fp, lr}
     a39c:	e28dd008 	add	sp, sp, #8, 0
     a3a0:	e12fff1e 	bx	lr
-    a3a4:	0000c624 	.word	0x0000c624
+    a3a4:	0000c618 	.word	0x0000c618
 
 0000a3a8 <cp14_enable>:
     a3a8:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -2474,15 +2474,15 @@ Disassembly of section .text:
     a4c4:	e59f0014 	ldr	r0, [pc, #20]	; a4e0 <cp14_enable+0x138>
     a4c8:	eb00026b 	bl	ae7c <printk>
     a4cc:	eb00039a 	bl	b33c <clean_reboot>
-    a4d0:	0000c67c 	.word	0x0000c67c
-    a4d4:	0000c698 	.word	0x0000c698
-    a4d8:	0000c7b0 	.word	0x0000c7b0
-    a4dc:	0000c684 	.word	0x0000c684
+    a4d0:	0000c670 	.word	0x0000c670
+    a4d4:	0000c68c 	.word	0x0000c68c
+    a4d8:	0000c7a4 	.word	0x0000c7a4
+    a4dc:	0000c678 	.word	0x0000c678
     a4e0:	0000b874 	.word	0x0000b874
-    a4e4:	0000c6ac 	.word	0x0000c6ac
-    a4e8:	0000c6c0 	.word	0x0000c6c0
-    a4ec:	0000c6d8 	.word	0x0000c6d8
-    a4f0:	0000c6f0 	.word	0x0000c6f0
+    a4e4:	0000c6a0 	.word	0x0000c6a0
+    a4e8:	0000c6b4 	.word	0x0000c6b4
+    a4ec:	0000c6cc 	.word	0x0000c6cc
+    a4f0:	0000c6e4 	.word	0x0000c6e4
 
 0000a4f4 <brkpt_match_set>:
     a4f4:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -2517,12 +2517,12 @@ Disassembly of section .text:
     a568:	e59f0018 	ldr	r0, [pc, #24]	; a588 <brkpt_match_set+0x94>
     a56c:	eb000242 	bl	ae7c <printk>
     a570:	eb000371 	bl	b33c <clean_reboot>
-    a574:	0000c7bc 	.word	0x0000c7bc
-    a578:	0000c684 	.word	0x0000c684
-    a57c:	0000c714 	.word	0x0000c714
-    a580:	0000c704 	.word	0x0000c704
+    a574:	0000c7b0 	.word	0x0000c7b0
+    a578:	0000c678 	.word	0x0000c678
+    a57c:	0000c708 	.word	0x0000c708
+    a580:	0000c6f8 	.word	0x0000c6f8
     a584:	0000b874 	.word	0x0000b874
-    a588:	0000c73c 	.word	0x0000c73c
+    a588:	0000c730 	.word	0x0000c730
 
 0000a58c <brkpt_mismatch_set>:
     a58c:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -2571,12 +2571,12 @@ Disassembly of section .text:
     a638:	eb00020f 	bl	ae7c <printk>
     a63c:	eb00033e 	bl	b33c <clean_reboot>
     a640:	004001e7 	.word	0x004001e7
-    a644:	0000c704 	.word	0x0000c704
-    a648:	0000c7cc 	.word	0x0000c7cc
-    a64c:	0000c684 	.word	0x0000c684
+    a644:	0000c6f8 	.word	0x0000c6f8
+    a648:	0000c7c0 	.word	0x0000c7c0
+    a64c:	0000c678 	.word	0x0000c678
     a650:	0000b874 	.word	0x0000b874
-    a654:	0000c714 	.word	0x0000c714
-    a658:	0000c778 	.word	0x0000c778
+    a654:	0000c708 	.word	0x0000c708
+    a658:	0000c76c 	.word	0x0000c76c
 
 0000a65c <brkpt_mismatch_start>:
     a65c:	e92d4010 	push	{r4, lr}
@@ -2592,7 +2592,7 @@ Disassembly of section .text:
     a684:	e3a02001 	mov	r2, #1, 0
     a688:	e5832000 	str	r2, [r3]
     a68c:	eafffff7 	b	a670 <brkpt_mismatch_start+0x14>
-    a690:	0000cfa0 	.word	0x0000cfa0
+    a690:	0000cf94 	.word	0x0000cf94
 
 0000a694 <brkpt_mismatch_stop>:
     a694:	ee103eb0 	mrc	14, 0, r3, cr0, cr0, {5}
@@ -2614,9 +2614,9 @@ Disassembly of section .text:
     a6d4:	e59f0010 	ldr	r0, [pc, #16]	; a6ec <brkpt_mismatch_stop+0x58>
     a6d8:	eb0001e7 	bl	ae7c <printk>
     a6dc:	eb000316 	bl	b33c <clean_reboot>
-    a6e0:	0000c790 	.word	0x0000c790
-    a6e4:	0000c7e0 	.word	0x0000c7e0
-    a6e8:	0000c684 	.word	0x0000c684
+    a6e0:	0000c784 	.word	0x0000c784
+    a6e4:	0000c7d4 	.word	0x0000c7d4
+    a6e8:	0000c678 	.word	0x0000c678
     a6ec:	0000b874 	.word	0x0000b874
 
 0000a6f0 <brkpt_fault_p>:
@@ -2644,19 +2644,19 @@ Disassembly of section .text:
     a73c:	e59f3004 	ldr	r3, [pc, #4]	; a748 <kmalloc_heap_end+0xc>
     a740:	e5930000 	ldr	r0, [r3]
     a744:	e12fff1e 	bx	lr
-    a748:	0000cfa4 	.word	0x0000cfa4
+    a748:	0000cf98 	.word	0x0000cf98
 
 0000a74c <kmalloc_heap_start>:
     a74c:	e59f3004 	ldr	r3, [pc, #4]	; a758 <kmalloc_heap_start+0xc>
     a750:	e5930004 	ldr	r0, [r3, #4]
     a754:	e12fff1e 	bx	lr
-    a758:	0000cfa4 	.word	0x0000cfa4
+    a758:	0000cf98 	.word	0x0000cf98
 
 0000a75c <kmalloc_heap_ptr>:
     a75c:	e59f3004 	ldr	r3, [pc, #4]	; a768 <kmalloc_heap_ptr+0xc>
     a760:	e5930008 	ldr	r0, [r3, #8]
     a764:	e12fff1e 	bx	lr
-    a768:	0000cfa4 	.word	0x0000cfa4
+    a768:	0000cf98 	.word	0x0000cf98
 
 0000a76c <kmalloc_init_set_start>:
     a76c:	e92d4030 	push	{r4, r5, lr}
@@ -2713,14 +2713,14 @@ Disassembly of section .text:
     a838:	e59f0020 	ldr	r0, [pc, #32]	; a860 <kmalloc_init_set_start+0xf4>
     a83c:	eb00018e 	bl	ae7c <printk>
     a840:	eb0002bd 	bl	b33c <clean_reboot>
-    a844:	0000cfa4 	.word	0x0000cfa4
-    a848:	0000ca04 	.word	0x0000ca04
-    a84c:	0000c7f4 	.word	0x0000c7f4
-    a850:	0000c800 	.word	0x0000c800
-    a854:	0000c828 	.word	0x0000c828
+    a844:	0000cf98 	.word	0x0000cf98
+    a848:	0000c9f8 	.word	0x0000c9f8
+    a84c:	0000c7e8 	.word	0x0000c7e8
+    a850:	0000c7f4 	.word	0x0000c7f4
+    a854:	0000c81c 	.word	0x0000c81c
     a858:	0000b874 	.word	0x0000b874
-    a85c:	0000c834 	.word	0x0000c834
-    a860:	0000c880 	.word	0x0000c880
+    a85c:	0000c828 	.word	0x0000c828
+    a860:	0000c874 	.word	0x0000c874
 
 0000a864 <kmalloc_notzero>:
     a864:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -2774,14 +2774,14 @@ Disassembly of section .text:
     a924:	e59f0020 	ldr	r0, [pc, #32]	; a94c <kmalloc_notzero+0xe8>
     a928:	eb000153 	bl	ae7c <printk>
     a92c:	eb000282 	bl	b33c <clean_reboot>
-    a930:	0000cfa4 	.word	0x0000cfa4
-    a934:	0000c82c 	.word	0x0000c82c
-    a938:	0000ca1c 	.word	0x0000ca1c
-    a93c:	0000c7f4 	.word	0x0000c7f4
+    a930:	0000cf98 	.word	0x0000cf98
+    a934:	0000c820 	.word	0x0000c820
+    a938:	0000ca10 	.word	0x0000ca10
+    a93c:	0000c7e8 	.word	0x0000c7e8
     a940:	0000b874 	.word	0x0000b874
-    a944:	0000c8c4 	.word	0x0000c8c4
-    a948:	0000c8dc 	.word	0x0000c8dc
-    a94c:	0000c908 	.word	0x0000c908
+    a944:	0000c8b8 	.word	0x0000c8b8
+    a948:	0000c8d0 	.word	0x0000c8d0
+    a94c:	0000c8fc 	.word	0x0000c8fc
 
 0000a950 <kmalloc>:
     a950:	e92d4030 	push	{r4, r5, lr}
@@ -2805,9 +2805,9 @@ Disassembly of section .text:
     a998:	e59f0010 	ldr	r0, [pc, #16]	; a9b0 <kmalloc+0x60>
     a99c:	eb000136 	bl	ae7c <printk>
     a9a0:	eb000265 	bl	b33c <clean_reboot>
-    a9a4:	0000c82c 	.word	0x0000c82c
-    a9a8:	0000ca2c 	.word	0x0000ca2c
-    a9ac:	0000c7f4 	.word	0x0000c7f4
+    a9a4:	0000c820 	.word	0x0000c820
+    a9a8:	0000ca20 	.word	0x0000ca20
+    a9ac:	0000c7e8 	.word	0x0000c7e8
     a9b0:	0000b874 	.word	0x0000b874
 
 0000a9b4 <kmalloc_aligned>:
@@ -2868,24 +2868,24 @@ Disassembly of section .text:
     aa8c:	e59f002c 	ldr	r0, [pc, #44]	; aac0 <kmalloc_aligned+0x10c>
     aa90:	eb0000f9 	bl	ae7c <printk>
     aa94:	eb000228 	bl	b33c <clean_reboot>
-    aa98:	0000cfa4 	.word	0x0000cfa4
-    aa9c:	0000c82c 	.word	0x0000c82c
-    aaa0:	0000ca34 	.word	0x0000ca34
-    aaa4:	0000c7f4 	.word	0x0000c7f4
+    aa98:	0000cf98 	.word	0x0000cf98
+    aa9c:	0000c820 	.word	0x0000c820
+    aaa0:	0000ca28 	.word	0x0000ca28
+    aaa4:	0000c7e8 	.word	0x0000c7e8
     aaa8:	0000b874 	.word	0x0000b874
-    aaac:	0000c990 	.word	0x0000c990
-    aab0:	0000c950 	.word	0x0000c950
-    aab4:	0000c9a4 	.word	0x0000c9a4
-    aab8:	0000ca44 	.word	0x0000ca44
-    aabc:	0000c9e8 	.word	0x0000c9e8
-    aac0:	0000c9b0 	.word	0x0000c9b0
+    aaac:	0000c984 	.word	0x0000c984
+    aab0:	0000c944 	.word	0x0000c944
+    aab4:	0000c998 	.word	0x0000c998
+    aab8:	0000ca38 	.word	0x0000ca38
+    aabc:	0000c9dc 	.word	0x0000c9dc
+    aac0:	0000c9a4 	.word	0x0000c9a4
 
 0000aac4 <kfree_all>:
     aac4:	e59f3008 	ldr	r3, [pc, #8]	; aad4 <kfree_all+0x10>
     aac8:	e5932004 	ldr	r2, [r3, #4]
     aacc:	e5832008 	str	r2, [r3, #8]
     aad0:	e12fff1e 	bx	lr
-    aad4:	0000cfa4 	.word	0x0000cfa4
+    aad4:	0000cf98 	.word	0x0000cf98
 
 0000aad8 <disable_UART>:
     aad8:	e92d4010 	push	{r4, lr}
@@ -3055,9 +3055,9 @@ Disassembly of section .text:
     ad18:	3afffff6 	bcc	acf8 <memcpy256+0x40>
     ad1c:	e28dd00c 	add	sp, sp, #12, 0
     ad20:	e8bd80f0 	pop	{r4, r5, r6, r7, pc}
-    ad24:	0000ca98 	.word	0x0000ca98
-    ad28:	0000ca4c 	.word	0x0000ca4c
-    ad2c:	0000ca5c 	.word	0x0000ca5c
+    ad24:	0000ca8c 	.word	0x0000ca8c
+    ad28:	0000ca40 	.word	0x0000ca40
+    ad2c:	0000ca50 	.word	0x0000ca50
 
 0000ad30 <memcpy>:
     ad30:	e3100007 	tst	r0, #7, 0
@@ -3222,14 +3222,14 @@ Disassembly of section .text:
     af8c:	8afffff8 	bhi	af74 <emit_val+0xcc>
     af90:	e28dd030 	add	sp, sp, #48, 0	; 0x30
     af94:	e8bd8010 	pop	{r4, pc}
-    af98:	0000cb5c 	.word	0x0000cb5c
-    af9c:	0000caa4 	.word	0x0000caa4
-    afa0:	0000cab4 	.word	0x0000cab4
-    afa4:	0000cad8 	.word	0x0000cad8
+    af98:	0000cb50 	.word	0x0000cb50
+    af9c:	0000ca98 	.word	0x0000ca98
+    afa0:	0000caa8 	.word	0x0000caa8
+    afa4:	0000cacc 	.word	0x0000cacc
     afa8:	cccccccd 	.word	0xcccccccd
-    afac:	0000cadc 	.word	0x0000cadc
-    afb0:	0000cae8 	.word	0x0000cae8
-    afb4:	0000cf30 	.word	0x0000cf30
+    afac:	0000cad0 	.word	0x0000cad0
+    afb0:	0000cadc 	.word	0x0000cadc
+    afb4:	0000cf24 	.word	0x0000cf24
 
 0000afb8 <vprintk>:
     afb8:	e92d4030 	push	{r4, r5, lr}
@@ -3401,11 +3401,11 @@ Disassembly of section .text:
     b250:	eb000039 	bl	b33c <clean_reboot>
     b254:	e28dd014 	add	sp, sp, #20, 0
     b258:	e8bd8030 	pop	{r4, r5, pc}
-    b25c:	0000cf30 	.word	0x0000cf30
-    b260:	0000cb68 	.word	0x0000cb68
-    b264:	0000caa4 	.word	0x0000caa4
-    b268:	0000cafc 	.word	0x0000cafc
-    b26c:	0000cb34 	.word	0x0000cb34
+    b25c:	0000cf24 	.word	0x0000cf24
+    b260:	0000cb5c 	.word	0x0000cb5c
+    b264:	0000ca98 	.word	0x0000ca98
+    b268:	0000caf0 	.word	0x0000caf0
+    b26c:	0000cb28 	.word	0x0000cb28
 
 0000b270 <default_putchar>:
     b270:	e92d4010 	push	{r4, lr}
@@ -3421,7 +3421,7 @@ Disassembly of section .text:
     b290:	e5830000 	str	r0, [r3]
     b294:	e1a00002 	mov	r0, r2
     b298:	e12fff1e 	bx	lr
-    b29c:	0000cf30 	.word	0x0000cf30
+    b29c:	0000cf24 	.word	0x0000cf24
 
 0000b2a0 <asm_not_reached_helper>:
     b2a0:	e92d4010 	push	{r4, lr}
@@ -3432,8 +3432,8 @@ Disassembly of section .text:
     b2b4:	e59f0008 	ldr	r0, [pc, #8]	; b2c4 <asm_not_reached_helper+0x24>
     b2b8:	ebfffeef 	bl	ae7c <printk>
     b2bc:	eb00001e 	bl	b33c <clean_reboot>
-    b2c0:	0000cb70 	.word	0x0000cb70
-    b2c4:	0000cba4 	.word	0x0000cba4
+    b2c0:	0000cb64 	.word	0x0000cb64
+    b2c4:	0000cb98 	.word	0x0000cb98
 
 0000b2c8 <asm_not_implemented_helper>:
     b2c8:	e92d4010 	push	{r4, lr}
@@ -3444,8 +3444,8 @@ Disassembly of section .text:
     b2dc:	e59f0008 	ldr	r0, [pc, #8]	; b2ec <asm_not_implemented_helper+0x24>
     b2e0:	ebfffee5 	bl	ae7c <printk>
     b2e4:	eb000014 	bl	b33c <clean_reboot>
-    b2e8:	0000cbd8 	.word	0x0000cbd8
-    b2ec:	0000cba4 	.word	0x0000cba4
+    b2e8:	0000cbcc 	.word	0x0000cbcc
+    b2ec:	0000cb98 	.word	0x0000cb98
 
 0000b2f0 <asm_todo_helper>:
     b2f0:	e92d4010 	push	{r4, lr}
@@ -3458,9 +3458,9 @@ Disassembly of section .text:
     b30c:	e59f000c 	ldr	r0, [pc, #12]	; b320 <asm_todo_helper+0x30>
     b310:	ebfffed9 	bl	ae7c <printk>
     b314:	eb000008 	bl	b33c <clean_reboot>
-    b318:	0000cc04 	.word	0x0000cc04
-    b31c:	0000cc3c 	.word	0x0000cc3c
-    b320:	0000cc70 	.word	0x0000cc70
+    b318:	0000cbf8 	.word	0x0000cbf8
+    b31c:	0000cc30 	.word	0x0000cc30
+    b320:	0000cc64 	.word	0x0000cc64
 
 0000b324 <asm_bad_exception_helper>:
     b324:	e92d4010 	push	{r4, lr}
@@ -3468,7 +3468,7 @@ Disassembly of section .text:
     b32c:	e59f0004 	ldr	r0, [pc, #4]	; b338 <asm_bad_exception_helper+0x14>
     b330:	ebfffed1 	bl	ae7c <printk>
     b334:	eb000000 	bl	b33c <clean_reboot>
-    b338:	0000cc78 	.word	0x0000cc78
+    b338:	0000cc6c 	.word	0x0000cc6c
 
 0000b33c <clean_reboot>:
     b33c:	e92d4010 	push	{r4, lr}
@@ -3478,12 +3478,12 @@ Disassembly of section .text:
     b34c:	e3a0000a 	mov	r0, #10, 0
     b350:	eb00008e 	bl	b590 <delay_ms>
     b354:	eb000069 	bl	b500 <rpi_reboot>
-    b358:	0000cc98 	.word	0x0000cc98
+    b358:	0000cc8c 	.word	0x0000cc8c
 
 0000b35c <program_end>:
     b35c:	e59f0000 	ldr	r0, [pc]	; b364 <program_end+0x8>
     b360:	e12fff1e 	bx	lr
-    b364:	0000cfb0 	.word	0x0000cfb0
+    b364:	0000cfa8 	.word	0x0000cfa8
 
 0000b368 <_cstart>:
     b368:	e92d4030 	push	{r4, r5, lr}
@@ -3528,12 +3528,12 @@ Disassembly of section .text:
     b404:	e59f0018 	ldr	r0, [pc, #24]	; b424 <_cstart+0xbc>
     b408:	ebfffe9b 	bl	ae7c <printk>
     b40c:	ebffffca 	bl	b33c <clean_reboot>
-    b410:	0000cf34 	.word	0x0000cf34
-    b414:	0000cfb0 	.word	0x0000cfb0
-    b418:	0000cca4 	.word	0x0000cca4
-    b41c:	0000cd44 	.word	0x0000cd44
-    b420:	0000ccd0 	.word	0x0000ccd0
-    b424:	0000cd14 	.word	0x0000cd14
+    b410:	0000cf28 	.word	0x0000cf28
+    b414:	0000cfa8 	.word	0x0000cfa8
+    b418:	0000cc98 	.word	0x0000cc98
+    b41c:	0000cd38 	.word	0x0000cd38
+    b420:	0000ccc4 	.word	0x0000ccc4
+    b424:	0000cd08 	.word	0x0000cd08
 
 0000b428 <int_vector>:
     b428:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -3545,9 +3545,9 @@ Disassembly of section .text:
     b440:	e59f000c 	ldr	r0, [pc, #12]	; b454 <int_vector+0x2c>
     b444:	ebfffe8c 	bl	ae7c <printk>
     b448:	ebffffbb 	bl	b33c <clean_reboot>
-    b44c:	0000cda4 	.word	0x0000cda4
-    b450:	0000cd54 	.word	0x0000cd54
-    b454:	0000cd78 	.word	0x0000cd78
+    b44c:	0000cd98 	.word	0x0000cd98
+    b450:	0000cd48 	.word	0x0000cd48
+    b454:	0000cd6c 	.word	0x0000cd6c
 
 0000b458 <prefetch_abort_vector>:
     b458:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -3559,9 +3559,9 @@ Disassembly of section .text:
     b470:	e59f000c 	ldr	r0, [pc, #12]	; b484 <prefetch_abort_vector+0x2c>
     b474:	ebfffe80 	bl	ae7c <printk>
     b478:	ebffffaf 	bl	b33c <clean_reboot>
-    b47c:	0000ce08 	.word	0x0000ce08
-    b480:	0000cdb0 	.word	0x0000cdb0
-    b484:	0000cdd8 	.word	0x0000cdd8
+    b47c:	0000cdfc 	.word	0x0000cdfc
+    b480:	0000cda4 	.word	0x0000cda4
+    b484:	0000cdcc 	.word	0x0000cdcc
 
 0000b488 <reset_vector>:
     b488:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -3573,9 +3573,9 @@ Disassembly of section .text:
     b4a0:	e59f000c 	ldr	r0, [pc, #12]	; b4b4 <reset_vector+0x2c>
     b4a4:	ebfffe74 	bl	ae7c <printk>
     b4a8:	ebffffa3 	bl	b33c <clean_reboot>
-    b4ac:	0000ce78 	.word	0x0000ce78
-    b4b0:	0000ce20 	.word	0x0000ce20
-    b4b4:	0000ce44 	.word	0x0000ce44
+    b4ac:	0000ce6c 	.word	0x0000ce6c
+    b4b0:	0000ce14 	.word	0x0000ce14
+    b4b4:	0000ce38 	.word	0x0000ce38
 
 0000b4b8 <undefined_instruction_vector>:
     b4b8:	e52de004 	push	{lr}		; (str lr, [sp, #-4]!)
@@ -3587,9 +3587,9 @@ Disassembly of section .text:
     b4d0:	e59f000c 	ldr	r0, [pc, #12]	; b4e4 <undefined_instruction_vector+0x2c>
     b4d4:	ebfffe68 	bl	ae7c <printk>
     b4d8:	ebffff97 	bl	b33c <clean_reboot>
-    b4dc:	0000cef4 	.word	0x0000cef4
-    b4e0:	0000ce88 	.word	0x0000ce88
-    b4e4:	0000ceb8 	.word	0x0000ceb8
+    b4dc:	0000cee8 	.word	0x0000cee8
+    b4e0:	0000ce7c 	.word	0x0000ce7c
+    b4e4:	0000ceac 	.word	0x0000ceac
 
 0000b4e8 <dev_barrier>:
     b4e8:	ea000002 	b	b4f8 <dsb>
@@ -3777,7 +3777,7 @@ Disassembly of section .text:
     b738:	eafffff7 	b	b71c <putk+0x8>
     b73c:	e3a00001 	mov	r0, #1, 0
     b740:	e8bd8010 	pop	{r4, pc}
-    b744:	0000cf30 	.word	0x0000cf30
+    b744:	0000cf24 	.word	0x0000cf24
 
 0000b748 <__udivsi3>:
     b748:	e2512001 	subs	r2, r1, #1, 0

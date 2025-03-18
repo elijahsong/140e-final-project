@@ -1,0 +1,2 @@
+my-install  ./new-tests/3-stack-interleaved.bin
+name: /dev/cu.usbserial-210, time: 1742284639
