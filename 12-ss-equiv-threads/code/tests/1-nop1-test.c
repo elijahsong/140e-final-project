@@ -4,7 +4,7 @@
 #include "expected-hashes.h"
 
 
-enum { N = 2 };
+enum { N = 20 };
 
 void notmain(void) {
     uint32_t h = 0;

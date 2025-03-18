@@ -201,9 +201,8 @@ void eqx_refork(eqx_th_t *th) {
     th->cumulative_inst_cnt = 0;
     th->reg_hash = 0;
 
-    if (th->tid == config.interleave_tid) {
-        thread_x_has_yielded = 0;
-    }
+    thread_x_has_yielded = 0;
+    complete_x_before_switch = 0;
 
     eqx_th_push(&eqx_runq, th);
 }

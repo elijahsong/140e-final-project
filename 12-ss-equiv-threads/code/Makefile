@@ -8,9 +8,14 @@
 # PROGS = tests/2-no-stack-test.c
 
 # PROGS += tests/1-mov-test.c
+# PROGS += tests/1-nop1-test.c
+# PROGS += tests/1-nop1-test-mod.c
+
 # PROGS += tests/1-nop10-test.c
-# PROGS += tests/1-nop10-test.c
-PROGS += tests/1-nop10-test-mod.c
+# PROGS += tests/1-nop10-test-mod.c
+
+PROGS += tests/2-no-stack-mod.c
+# PROGS += tests/7-mini-test.c
 
 # # very simple tests. start here.
 # PROGS += tests/0-nop1-test.c

@@ -26,4 +26,4 @@ int interleave_check(checker_config_t c);
 // Then B interleaved with A, C, D
 // Then C interleaved with A, B, D
 // Then D interleaved with A, B, C
-int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, int enable_stack, int max_num_inst, int verbosity);
+int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, int max_num_inst, int verbosity, int enable_stack);

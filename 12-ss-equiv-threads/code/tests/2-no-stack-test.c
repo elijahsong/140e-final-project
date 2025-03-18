@@ -50,10 +50,13 @@ void notmain(void) {
 
     //  strategy: i would run just the first routine first and comment out
     //  the rest.  make sure it works.  then do the next, then the next etc.
-
+    
     // do the smallest ones first.
+    eqx_verbose(0);
     let th1 = run_single(3, small1, 0, SMALL1_HASH);
     let th2 = run_single(3, small2, 0, SMALL2_HASH);
+
+    
     // these calls re-initialize the threads and put them on the 
     // run queue so they can be rerun.
     eqx_refork(th1);
@@ -67,13 +70,14 @@ void notmain(void) {
     let th_mov_ident = run_single(3, mov_ident, 0, MOV_IDENT_HASH);
     let th_nop10 = run_single(3, nop_10, 0, NOP10_HASH);
 
+    uint32_t h = 0;
     // now run all three 
     eqx_refork(th_nop1);
     eqx_refork(th_nop10);
     eqx_refork(th_mov_ident);
-    eqx_run_threads();
+    h = eqx_run_threads();
 
-    trace("second no-stack passed\n");
+    trace("second no-stack passed, [nop1, nop10, mov_ident]hash:%x\n", h);
 
     // run all together: interleaving all 5 threads.
     eqx_refork(th1);
@@ -81,7 +85,7 @@ void notmain(void) {
     eqx_refork(th_nop1);
     eqx_refork(th_nop10);
     eqx_refork(th_mov_ident);
-    eqx_run_threads();
+    h = eqx_run_threads();
 
-    trace("all no-stack passed\n");
+    trace("all no-stack passed, [small1, small2, nop1, nop10, mov_ident]hash:%x\n", h);
 }
