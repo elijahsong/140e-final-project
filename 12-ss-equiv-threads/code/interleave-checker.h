@@ -11,10 +11,19 @@
 typedef struct checker_config {
     void (*A)(void *);
     void (*B)(void *);
+    void *argA;
+    void *argB;
     int n_copies;
-    int stack_nbytes;
+    int enable_stack;
     int max_num_inst;
     int verbosity;
 } checker_config_t;
 
+// Run the function A interleaved with `n_copies` of B 
 int interleave_check(checker_config_t c);
+
+// Run the primary function A interleaved with B, C, D, ...
+// Then B interleaved with A, C, D
+// Then C interleaved with A, B, D
+// Then D interleaved with A, B, C
+int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, int enable_stack, int max_num_inst, int verbosity);

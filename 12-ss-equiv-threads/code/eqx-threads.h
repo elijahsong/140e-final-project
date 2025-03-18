@@ -54,6 +54,8 @@ typedef struct eqx_th {
 // assumes it has total control of system calls etc.
 void eqx_init(void);
 
+int thread_x_completed_before_yielding(void);
+
 // run all the threads until the runqueue is empty.
 //  - returns xor-hash of all hashes.
 uint32_t eqx_run_threads(void);
