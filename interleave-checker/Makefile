@@ -1,4 +1,4 @@
-SUBDIRS=  code
+SUBDIRS= code
 
 .PHONY: all check clean
 all check clean: $(SUBDIRS)
@@ -11,7 +11,7 @@ clean: TARGET=clean
 
 # recursive call to make
 $(SUBDIRS): force
-	$(MAKE) -s -C $@ $(TARGET) RUN=0
+	$(MAKE) -s -C $@ $(TARGET)
 
 clean:
 	rm -f *~ *.bak

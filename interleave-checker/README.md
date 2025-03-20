@@ -1,386 +1,313 @@
-## Lab: using single stepping to check interleaving.
-
-### Errata and clarifications.
-
-Notes:
-
-  - If you add threads (extension): make sure you use `switchto`
-    rather than `cswitch` in the exception handler. If you recall
-    from past labs we've gone with the convension of having all
-    exception handlers use the same stack.   Instead you should
-    save the registers passed into the handler, and use a switchto
-    to go from one to the other.
-
-  - For tests that have errors: `make check` may not pass because
-    you might legitimately have a different number of errors than we do.
-
-    While checking at the machine code level makes the tool powerful,
-    it also means you may not match our tests if the number of machine
-    code instructions your compiler emitted for a test differs from ours.
-    Currently our stance is that you'll have to look at the tests to see
-    if they make sense (the pro argument for this is that it helps your
-    reason about what is going on).
-
-  - On the above note: Test 1 is not passing for a bunch of people.
-    You can skip it.
-
-  - Note: you'll have to cast-away the volatile when calling B
-    from your single-step handler.  Something like:
-
-            // call B
-            if(!c->B((void*)c)) {
-                ...
-
-    This is ugly (sorry) but is safe for what we are doing today.
-
-  - Use the tests in `code/tests` (not `code/tests-2.0`) unless you
-    do extensions.  The `code-tests-2.0` require `yield()`.
-
-  - As the `breakpoint.h` header file states: these routines will
-    be very close to those in `mini-step.h` so adapting your code from
-    lab 9 should be quick.  We have renamed them b/c there was some
-    variations in how people built theirs b/c the lab 9 README was
-    unclear on exact functionality.
-
-  - The trylock discussion has been simplified, so look at the
-    README.
-
----------------------------------------------------------------
-
-### Intro
+## Equivalance checking finale.
 
 
-Now that you have a single-step implementation, we'll use it to for
-something cool: writing a concurrency checker that is tiny but mighty.
-By the end you'll be able to race condition bugs difficult to catch with
-any other tool I know of.
+<p align="center">
+  <img src="images/pi-threads.jpg" width="700" />
+</p>
 
-The trick we'll play would be difficult to do on Mac or Linux, but for us
-is easy --- the fact that we have a small, completely controlled system
-makes it easy to add weird, powerful tricks.  This lab was a favorite
-in 240lx so is a good break from our low-level death march.  It's also
-good example of what you can do with OS hacks for a final project.
+### clarifications and notes
 
-The basic idea: 
-  1. Given two client routines A() and B() the purport to handle
-     concurrency;
-  2. Run `A(); B();` to get the state if they ran sequentially.
-  3. Then run `A()` for 1 instruction (using single stepping):
-        - switch to `B()` and run `B()` to completion;
-        - switch back to `A()` and run `A()` to completion.  
-        - Then check that the state is the same as in step 2.
-        - If so: success.  
-        - If not: bug.
-  4. Run A() for 2 instructions...
-  5. Run A() for 3 instructions...
-  6. Stop when there are no more instructions in A() to switch on.
-     
-At the end you've done pre-emptive context switching on `A()` at every
-single instruction and verified that you always get the same answer.
-Tons of extensions!  Great for final projects.
+***BUGS***:
+  - `kmalloc_init` signature changed, breaking the build.  Change 
+    `kmalloc_init()` to `kmalloc_init(1)`.  This is my bad, apologies.
 
-For this lab you'll have to read the comments. Sorry :( 
-  - `code/check-interleave.h`: has the the interface.
-  - `code/check-interleave.c`: has a working version.
-  - `code/tests/` has tests.  As usual, test 0 is easier than test 1 etc.
-    You should look at the tests to see how the tool works.
+  - the comment for `full-except-asm.S:syscall_full` is wrong:
+    you *must* set the `sp`.  (Fortunately the tests seem to catch this
+    dumb mistake.)
+
+NOTE:
+  - You have to drop in your own `breakpoint.c` from lab 10
+    and delete ours from the `Makefile`.  (You might have put these
+    `breakpoint.h` implementations in `mini-step.c` which is fine.)
+
+  - If you do a pull, there is a `code/switchto.h` that got added
+    with a better type signature for `cswitch`.
+
+  - The threading code as checked in only checks user level threads
+    so as a result *only checks user code* --- it won't be checking
+    the privileged routines out of the box.   
+
+    You're strongly urged to do so as the "interesting" code you write.
+    (See below).
+
+
+### overview
+
+Today's lab is a mid-term checkpoint.
+By the end of the lab we will verify that the breakpoint and
+state switching assembly you wrote 
+in the last lab is correct by:
+ 1. Dropping it into a crazy pre-emptive threads package;
+ 2. Use single step hashing verify 
+    that the threads behave 
+    identically under all possible thread interleavings.
+
+Next lab we will use this same basic approach to also verify that
+virtual memory works.
+
+Mechanically:
+ 1. You'll drop the assembly routines you wrote last time one at a time 
+    replacing ours and check that the lab 10 tests still work.  You will
+    be able to swap things in and out.
+
+ 2. Once that works run the threads and check hashes (more on this later).
+
 
 Checkoff:
- 1. Do part 1 and part 2.   
- 2. Implement `breakpoint.h` and make sure you get the same results
-    as ours (should be trivial adaptation from last lab).
- 3. Add a couple non-ridiculous ai-generated tests and find bugs (or not
-    if it gets it right!)
- 4. Ideally (but not required) do part 3 and 4 or some extensions.
-   This is a great extension lab.
+  1. `make checkoff` works in `code`.  You have to delete
+     our `staff-breakpoint.o` , `staff-switchto-asm.o` and
+     `staff-full-except-asm.o`.  Note, you built the `breakpoint.h`
+     interface in lab 10.
 
-Run it through the autograder with `lab10`
+  2. You have a final project description turned in.
 
------------------------------------------------------------------------
-### Background
+  3. You do something interesting cool with the threads package.
+     See Part 2 below.
 
-#### Interface
+     One big option: run in privileged mode with matching (discussed
+     in Part 2, also counts as an extension).
 
-The client interface is `checker_t:checker-interlace.h`.  The client gives us
-a `checker_t` structure with four routines:
-  1. `c->A()`, `c->B()`: the two routines to check.
-  2. `c->init()`: initialize the state used by `A()` `B()`.   Calling this
-      after running A() and B() should always set their data to the same
-      initial values so that they are deterministic.
+There are absolutely a bazillion extensions.  You can easily
+do a final project based off this lab.
+  
+----------------------------------------------------------------------
+### Part 1: start replacing routines and make sure tests pass.
 
-  3. `c->check()`: called after running `A(); B()`: returns 1
-      if state was correct, 0 otherwise.  This routine uses code-specific
-      knowlege to decide if the final state is correct.
+The code for this part is setup so you can flip routines back and forth.
+As is, everything should pass "out of the box"
 
-A sequential execution would look like:
+Maybe the easiest way to start:
+  1. Go through `switchto-asm.S`, in order, rewriting each routine to
+     use the code you wrote in the last lab. (I would comment out the
+     calls to our code so you can quickly put them back.) Make sure the
+     tests pass for each one!  Once all are replaced, comment out our
+     `staff-switchto-asm.o` from the Makefile.
 
-```
-        // 1.  initialize the state.
-        c->init(c);
-        // 2. Call A(), run to completion.
-        c->A(c);
-        // 3. Call B(): should not fail b/c A() already finished
-        if(!c->B(c))
-            panic("B should not fail\n");
-        // 4. check that the state passes.
-        if(!c->check(c))
-            panic("check failed sequentially: code is broken\n");
-```
+     To help understand you should look at `switchto.h` which calls these 
+     routines.
 
-If this does not pass the code is very broken and we complain.
+  2. Go to `full-except-asm.S` and write the state saving code.  This should
+     mirror the system call saving you did last lab. 
+     Make sure the tests pass for each one.  Once all calls to our code     
+     are removed (I would comment them out so you can flip back if needed)
+     remove the link from the Makefile.
 
-Assuming a single run passes, we can can put this block of code in a loop
-(as our example code in `check-interleave.c:check` does) and run it multiple
-times and should pass each time.  If it does not:
-  1. `A()` or `B()` might be non-deterministic;
-  2. `init()` might not reset the state correctly.
-  3. `check()` might not check correctly.
+     To help understand you should look at the `full-except.c` code which
+     gets called from it.
 
+  3. Replace our `staff-breakpoint.o` with yours from lab 10.
+     You might have put that code in your `mini-step.c` which is
+     fine.
 
-#### Single stepping on the armv6 (review)
+How to check:
+ - You should be able to run "make checkoff".  This will compare all
+   the 0, 1, and 2 tests to their out files.  It will also run tests
+   3 and 4 which we can't compare outfiles to but have internal
+   checks.
 
-As you recall from last lab, single-stepping on the ARMv6 cpu we use
-(arm1176) has two weird features:
-
-  1. You won't get single-step faults unless running at user mode.
-     Thus, we'll have to run A() at user level (the initial mode is
-     SUPER).
-
-  2. ARMv6 implements single-stepping by using a "mismatch fault" where
-     you give a code address `addr` and the CPU will throw a mismatch
-     fault when the pc is equal to an address that is not equal to `addr`.
-     To single step A():
-
-        - set the initial mismatch address to the first instruction of A.
-        - start running at user level.
-        - you'll get a fault: in the fault handler, get the address
-          of the fault (the value of the pc register), set a mismatch on
-          `pc`, and then jump back.
-        - this will cause you to single-step through all the code.
-    
-     Note: the checked in code does this; you just need to modify   
-     the base code.
-
-#### Single stepping A()
-
-The code in `check:check-interleave.c` gives an example of how
-to run `A()` in single step mode (but without switching).  
-This has several pieces:
-  1. We need to install exception handlers:  the calls to `full_except_*`
-     at the start of `check` do this.  This uses the code from 140e:
-     you should be able to drop in your versions.
-  2. We need to run A at user level in single stepping mode.  
-     The call to `run_A_at_userlevel` does this.
-  3. We need to set faults and handle them: `single_step_handler_full`
-     does this.
-
-What `run_A_at_userlevel` does:
-  1. It creates a full register set (see `switchto.h:reg_t`) for A
-     that can be switched into using `switchto_cswitch`.
-
-     The register block `reg_t` is defined in `switchto.h` and is just
-     17 words to hold the 16 general purpose registers (r0 in offset 0,
-     r1 in offset 1, r15 --- the pc --- in offset 15) plus the cpsr
-     (in offset 16).
-
-  2. The arm has 16 general purpose registers and the process status
-     word.  We use the CPSR of the current execution and just swap
-     the mode.  We set PC (r15) to the address of A().  We set the
-     stack pointer register sp to the end of a big array (stack
-     grows down).   
-
-     One tricky bit is that we set the return address register (lr)
-     to the address of `A_terminated`: we do this so when A is done
-     and returns it jumps to this routine and we can switch back into
-     the checker.
-
-     A second tricky bit is that `A_terminated` cannot just switch
-     back to the original code b/c it is running at USER level so lacks
-     permissions to switch back to `SUPER` (our original privileged mode).
-     Thus it invokes a system call `sys_switchto(&start_regs)` which will
-     cause a system call exception, (running in privileged mode) that will
-     evantually calling the handler we registered `syscall_handler_full`.
-
-  3. It turns on mismatching (single stepping).
-  4. It then context switches from the current code to
-     A() using `switchto_cswitch` (this is given; you built it in 140E).
-
-  5. When A() is done and calls `A_terminated()` it will switch back
-     using `start_regs`, which will turn off mismatch and return.
-
-What `single_step_handler_full` does:
-  1. It is passed in the full register set live when the code was
-     interrupted.
-  2. It verifies this was a single step fault.
-  3. It then gets the pc, prints out a simple message.
-  4. Resets the mismatch for the pc (so just that address will run)
-  5. does a `switchto` to jump back to the exception code.
-
------------------------------------------------------------------------
-### Part 0: turn off single-step when `A()` calls `A_terminated()`
-
-If you compile and run the code you'll notice the single-step handler
-prints a ton of instructions even though `A()` is tiny.  The reason for
-this is that when A() exits, it jumps to `A_terminated()`:
-  - If you look at `run_A_at_userlevel`  you can see how the 
-    brain-surgery on the "thread" running A looks similar
-    to your `rpi-thread.c` code.
-  - The assignment of `A_terminated` to the `lr` register means that
-    when `A()` returns it will automatically call `A_terminated`.
-    This is similar to our exit hack in `rpi-thread.c`.
-
-Your first simple hack should be to change the single step handler
-to compare the `pc` value against `A_terminated()` and if equal, turn
-single stepping off.  After doing so, the test output should do down
-dramatically.
-
-Easiest approach: 
-  - change the Makefile to only run `tests/0-epsilon-test.c`.
-
------------------------------------------------------------------------
-### Part 1: do a single switch from A() to B()
-
-For this make sure your code handles all tests tests besides test 4.
-Test 3 and 5 are reasonable; the others are trivial.  
-
-Don't be afraid to add print statements (that you can easily disable)
-to see which routine is running, and at what pc location.   You can add
-to the tests as well.
-
------------------------------------------------------------------------
-### Part 2:  make a `sys_trylock()` for test 4.
-
-For this you'll add a system call that implements the try-lock needed for
-test `4-trylock-ok-test.c`.    This is an example of a common pattern
-we will do in the checker: implement a concurrency primitive using a
-system call so that we (1) don't interrupt it with single-stepping and
-(2) have a complete context for the blocking thread so we can yield from
-one to another if needed.
-
-(Note, this isn't the only way we can acheive these two goals.)
-
-Adding a system call is pretty straightforward (you've done in several
-labs).  The challenge for us is that we can only call system calls from
-user-level not any privileged level (not fundamental --- this is just
-b/c of how we've implemented the code).  The easiest hack to handle this
-is problem is to just check which mode we are at, something like:
-
-```
-    // check-interleave.h
-    static inline int sys_lock_try(volatile int *l) {
-        // in rpi-inline-asm.h
-        uint32_t cpsr = cpsr_get();
-        
-        // libpi/include/cpsr-util.h
-        if(mode_get(cpsr) == USER_MODE)
-            return syscall_invoke_asm(SYS_TRYLOCK, l);
-        else
-            todo("just call the trylock directly\n");
-    }
-```
-
-This might be a good idea to just get things working.  However, all
-extensions need a more general approach of multiple threads.  So you
-should run `B()` as a second thread after the above works (or just skip
-to using second thread immediately).
-
-You can run B() as a seperate thread by:
- 1. Adapt the the `run_A` code to create a second thread.  Note: b/c
-    of armv6 restrictions make sure you are allocating the stack to be
-    8-byte aligned.  You'll need to change the code so on exit it does
-    the right thing for both the A and the B thread.
-
- 2. Have a thread queue that you put the threads on and dequeue (as usual).
- 3. Adapt your single step handler to use a `switchto` to the next thread
-    rather than calling B() directly.
- 4. For some code you wo't be able to run the sequential check as-is, so 
-    either disable it, or make sure your threads can handle "running 
-    sequentially".
-
-This test is pretty dumb, so you probably should write another one.
-
------------------------------------------------------------------------
-### Part 3:  make a `sys_yield()`.
-
-For simplicity, our base checking system assumed it could call B() in
-the exception handler and it would run to completion: i.e., it couldn't
-yield back to `A()`  if the shared state was not ready (e.g., in the
-case of a shared queue, if `B()` wanted to do a pop
-and `A()` hadn't done a push yet).
-
-Two lame consequences:
- 1. Our base checker interface is a bit hacked in that it has
-    B() return a failure if it can't make progress rather than yield
-    and wait.
- 2. As a result of (1) we check a dramatically smaller set of 
-    interleavings than are possible --- e.g., we only run `B()`
-    to completion when the shared state is completely setup.   This
-    will cause us to miss errors.
-
-So, fix this:
-  1. Use the fact we have two threads (from part 2) to implement a new
-     system call, `sys_yield()` so that B (and A) can yield to the
-     other thread when it needs it additional work done before it can
-     make progress.
-  2. Write a test that shows your yield works as expected.
-  3. Make copies and rewrite the tests so that they do yield rather 
-     than have B() return an error.
-
------------------------------------------------------------------------
-### Part 4: add some interesting tests.
-
-Easy mode: get some "lock-free" code from GPT or Claude and check it.
-Should be able to find some bugs.
-
-More interesting: check gcc's synchonization library code.  The cool thing
-about single-step is that we work just as well on machine code. (Though
-it's harder to debug!).
-
-Other possible: 
- - Rewrite circular to use compiler memory barriers and look for bugs.
- - Extend the checker to look for bugs in interrupt handlers.
-
------------------------------------------------------------------------
-### Speed Extension (Recommended): only switch on memory operations.
-
-Obviously the number of interleavings explodes with the number of
-switches and/or code size.  Fortunately we can dramatically reduce
-the interleavings we need to explore with the simple observation that
-`A()` and `B()` can only effect each other if they do a memory or
-synchronization operation.  Local modifications to their own registers
-(e.g., an add, subtract, multiply, or branch) it can't affect the other.
-
-Thus we only need to switch on memory or synchornization operations.
-To do this you can decode the instruction that was interrupted and only
-switch if it was a memory or sync operation.  You already have some idea
-of how to decode instructions from the JIT labs: in our case we don't
-need to know the exact instruction, just that it does memory.
-
-To help this I checked in a new header (`code/is-mem.h`) for determining if a 
-instruction is a load or a store.  (If you also handle synchronization
-operations, you'd have to add them.)  
-
-It's possible that switching before each memory operation should be
-enough, but you should have a correctness argument for your approach.
-
-There's a bunch of tweaks you can do:
-
------------------------------------------------------------------------
-### Other Extensions
-
-There's an enormous number of extensions:
-  - Extend the code to do 2 switches, 3 switches, etc.
-
-  - Make the error handling better.  E.g., on the unix side,
-    use `addr2line` to convert the code addresses we ran on to line numbers.
+ - You can save time by just running 3 and 4.  If these pass I'll
+   be shocked if 0, 1, 2, fail.  It's that these are easier to debug.
 
 
-  - Speed: the number of paths grows exponentially with the number of
-    switches.  The standard way to handle this is to hash the memory
-    state and if you get to the same program point with the same state,
-    prune execution.
+NOTE: 
+ - will be checking in more description.
 
-    As a crude method you could side-step the need to know what memory
-    locations are being read or written by hashing the register set for
-    each thread and prune when the remaining context switches are  the
-    same (or fewer) than a previous state.
+----------------------------------------------------------------------
+### Part 2: do something cool / useful with your pre-emptive threads
+
+Do something interesting or cool with the equivalance threads.
+Some easy things:
+
+
+  - We always switch every instruction.  This won't necessarily
+    find all bugs.  It's good to have a mode than can randomly switch.
+    Perhaps every 2 instructions on average, then every 3 instructions
+    on average, etc.   But you can make whatever decision seems
+    reasonable.  
+
+    If you recall in lab 11 we used `pi_random()`.  You'll need 
+    to include:
+
+            #include "pi-random.h"
+
+    Also, `pi_random()` uses division, and the ARM doesn't have it.
+    So we also have to include a gcc library to emulate it by adding
+    the following to the end of the `code/Makefile`
+
+            LIB_POST += $(CS140E_2025_PATH)/lib/libgcc.a
+
+    Before the line:
+
+            include $(CS140E_2025_PATH)/.../Makefile.robust
+
+    Finally(!), do a git pull of libpi to update the makefile.
+
+    And can then just call it:
+
+            uint32_t v = pi_random();
+
+     
+  - You could add a yield (like your `rpi-threads.c` had) 
+    and some tests to check that it works.  Potentially
+    can add other routines (such as `wait()`).  This 
+    involves adding new system calls.  AFAIK these should
+    work fine with hashes.
+
+  - Add a working lock, trylock or other mutual exclusion
+    system calls.
+
+  - A bigger thing (which counts as an extension) is to do your
+    interleave checker for real now that we have threads --- we
+    can currently check an arbitrary number of threads.  You can
+    spin this up into a final project.
+
+  - Another cool thing (not exactly trivial) is to run multiple
+    threads using the same stack by copying their stack in and out on
+    switch (a form of swapping).  It lets you run multiple routines at
+    the same location with the same stack and so get the same hashes.
+    As a side effect this will make it clear why we use VM, but is
+    actually cool.
+
+
+  - Add timer interrupts and check that the hashes remain the same.
+    Note: You will need to enable interrupts in the thread's CPSR.
+    This will change the hashes.  The general way to handle this is to
+    remap the CPSR bits during hashing: (1) verify that the current
+    CPSR has interrupts turned on (7th bit is 0), (2) make a copy of
+    the regs to hash, (3) disable interrupts in the copy of the CPSR
+    (7th bit set to 1), (4) hash the registers.
+
+    (Re-mapping CPSR bits let's you play around with machine state
+    but still validate that nothing changed in the equivalance
+    hashes.)
+
+    A few notes:
+      - Our libpi isn't thread safe.  The easiest way to handle this
+        is to leave the CPSR disabled in kernel mode.  However, depending
+        on how long handling debug exceptions takes, this means you will
+        always get a timer interrupt on every instruction.  You might
+        need to increase the timer period significantly.  In any case
+        should check how many interrupts occur during each thread to
+        make sure you have them on at user level.
+
+      - You should verify that interrupts are off for
+        your prefetch handler and for your system call handler for 
+        similar reasons.
+
+      - You'll have to add a routine to `staff-full-except.c` to 
+        handle interrupts.
+
+  - Even better than all the above is something cool you come up with!
+
+With all that said the best thing to do is the following:
+
+----------------------------------------------------------------------
+### The best Part 2
+
+The absolute best thing you can do --- and considered a major extension
+--- is to also test your privileged switching and exception trampolines.
+The way you do so is to run the threads at SYSTEM level (privileged)
+but use breakpoint *matching* (which works at privileged) rather than
+*mismatching* (which does not).
+
+The challenge here is that unlike mismatching, for matching
+you have to know the exact pc to match on. 
+
+The easiest quick and dirty hack is to run on on code that does
+not branch --- this means that the next PC to match on is the 
+current PC+4 bytes.
+
+Fortunately we have a bunch of routines in `staff-start.S` 
+that don't use branch at all.
+
+So the basic algorithm:
+  1. Fork the routines in `staff-start.S` and add a boolean to
+     the thread control block indicate you are running in matched mode.
+     You should probably also check the CPSR and if its in USER mode
+     assert that that match mode is false and if its SYSTEM mode that
+     its true.
+
+  2. In order to check that you get the same hash, before hashing
+     in the match handler make a copy of the registers,
+     and swap modes from SUPER to USER and then hash.  You should
+     get the same answer as your mismatch runs.
+  3. Note: you will have to change some assertions that check
+     that system calls only occur at user mode so that they work
+     at both USER and SYSTEM mode.  You'll have to change the
+     `full-except.c` code to patch the registers.
+  4. You'll also have to add routines to match and disable matching.
+     Note, that you should do matching on `bvr1` and `bcr1` since
+     single stepping is using `bvr0` and `bcr0`.  If you don't
+     do this then as soon as the code calls mis-match, your matching
+     will get overwritten and stop working.
+
+  5. Common mistake is to miss a place to put the matching calls:
+     you should search through the code for mismatch calls and make sure
+     these are paired with match calls for threads in match mode.
+
+The less hacky way which is even more of a major extension is to
+handle code that branches by:
+ 1. Run a routine at USER level in single stepping mode, 
+    recording the instructions it ran in a per thread array.
+ 2. Rerun at USER and make sure you get the same trace.
+ 3. Then rerun the routine at SYSTEM mode, but instead of mismatching
+    do matching (using the addresses in the array).
+
+#### A different method: rerun one instruction.
+
+A less code (I think) but more IQ intensive method to test privileged
+and unpriviledged switching is to rerun each instruction at a privileged
+mode after you get a mismatch exception and check that it produces the
+same registers.
+
+This would work as follows:
+  1. Add a `reg_t` field to the thread block that holds a copy
+     of the previous registers (e.g., `reg_t prev_regs;`). 
+  2. Run each thread at USER as normal;
+  3. Each time you get a mismatch exception:
+     1. Record the registers passed to the exception handler.
+     2. Rerun exactly that one single instruction using
+       `prev_regss` at a higher privilege;
+     3. Compare the registers from (ii) to those from (iii)
+        and make sure they are the same.
+     
+        (Note this will require some cleverness since this
+        will be two different exception invocations.)
+
+Note:
+  - The way our exceptions work, we don't handle recursive 
+    faults.  You could change this. Or you could record
+    enough state that you can remember where you were.
+  - This technique won't always work with device memory.
+  - Also potentially won't work if the instruction modifies
+    memory in a way that running it a second time gives a different
+    answer.  The easiest way to start is with the stackless
+    routines in `staff-start.S` which don't write memory.  You
+    can then scale up to more complex.  
+
+The cool thing is that once you have this method working, you can
+then repurpose it to detect which instructions are not virtualizabe by
+turning it into an automatic checker that detects when an instruction
+fundamentally behaves differently at user mode and privileged mode.
+
+The ARM has several of these instructions buried in its massive
+ISA, so it's great to have an automatic method for finding them.
+
+There's not enough information here, so ask if this seems potentially
+interesting :)
+
+----------------------------------------------------------------------
+### Summary
+
+Mistakes in context switching and exception trampolines are some of
+the hardest you can hit.  This lab has shown how to find them fairly
+easily by exploiting low-level debugging hardware.  You can generalize
+this approach to check many OS and non-OS properties.  (We will use it
+throughout virtual memory.)
+
+There are tons of final projects you can do based off of this lab.
+  - Combine it with your interleave checker.
+  - Tune the code aggressively  relying on the fact that
+    equivalance hashing detects bit-level mistakes.  Am curious how much
+    faster you can make it!
+  - Many others.

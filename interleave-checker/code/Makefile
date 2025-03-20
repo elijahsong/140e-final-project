@@ -1,42 +1,93 @@
-# work through all the tests in tests/ in order.  you
-# should look at the tests!!
+# "make checkoff" should run a bunch of tests.
 #
-# if you build the code needed for yield:
-#   PROGS := $(wildcard tests-2.0/[023567]*-test.c)
 
-PROGS := tests/4-trylock-ok-test.c
-PROGS := tests/3-circular-ok-test.c
-PROGS := tests/1-epsilon-should-fail-test.c
-PROGS := tests/2-increment-fail-test.c
 
-# everything [ignore 1]
-# PROGS := $(wildcard tests/[023567]*-test.c)
-PROGS := $(wildcard tests-2.0/[02345]*-test.c)
+# ====== Run all new tests =====
+PROGS := $(wildcard new-tests/[01234567]*.c)
 
-# simple vacuous test.
-# PROGS := tests/0-epsilon-test.c
 
-# all your code will be in here.
-COMMON_SRC += check-interleave.c   
+# ==== Lab 15/17 Page Table VM Tests ====
+# PROGS := $(wildcard pt-tests/[1234]-*c)
 
-# trivial asm to invoke system calls
-COMMON_SRC += syscall-invoke-asm.S
+# ==== Lab 12 Tests, along with new versions ====
+# note: 
+#  - the 4,3,2 tests won't work with make check
+#  - but they should pass their internal checks.
+# PROGS = tests/4-cool-test.c
 
-# you can drop your versions in from 140e.
-STAFF_OBJS += staff-full-except-asm.o
-STAFF_OBJS += staff-full-except.o
-STAFF_OBJS += staff-switchto-asm.o
-STAFF_OBJS += staff-single-step.o
+# PROGS = tests/3-stack-test.c
+# PROGS += new-tests/3-stack-interleaved.c
 
-# switch to pi-install if you want to use the staff.
+# PROGS = tests/2-no-stack-test.c
+# PROGS += new-tests/2-no-stack-interleaved.c
+
+# PROGS += tests/1-mov-test.c
+# PROGS += new-tests/1-mov-test-mod.c
+
+# PROGS += tests/1-nop1-test.c
+# PROGS += new-tests/1-nop1-test-mod.c
+
+# PROGS += tests/1-nop10-test.c
+# PROGS += new-tests/1-nop10-test-mod.c
+
+
+# PROGS += new-tests/2-mini-test.c
+
+# # very simple tests. start here.
+# PROGS += tests/0-nop1-test.c
+# PROGS += tests/0-small1-test.c
+# PROGS += tests/0-nop10-test.c
+# PROGS += tests/0-mov-test.c
+
+# we start with this b/c it's cute.
+# PROGS = tests/4-cool-test.c
+
+# we give you these files code.  you can start tweaking them
+# when pass the tests.
+COMMON_SRC += eqx-threads.c
+COMMON_SRC += breakpoint.c
+COMMON_SRC += staff-full-except.c
+
+COMMON_SRC += interleave-checker.c
+
+# this calls staff: replace routines 1 by 1.
+COMMON_SRC += switchto-asm.S
+
+# this calls staff: replace routines 1 by 1.
+COMMON_SRC += full-except-asm.S
+
+# More helpers (Lab 15 and 17)
+COMMON_SRC += mmu-helpers.c
+COMMON_SRC += pt-vm.c
+COMMON_SRC += your-mmu-asm.S
+COMMON_SRC += mmu.c
+
+# we give you a kmalloc
+STAFF_OBJS += $(CS140E_2025_PATH)/libpi/staff-objs/kmalloc.o
+
+# as you replace routines comment these out.
+# STAFF_OBJS += staff-full-except-asm.o
+# STAFF_OBJS += staff-switchto-asm.o
+
 BOOTLOADER=my-install
-# runs the code automatically.  set to 0 if not.
 RUN = 1
+CAN_EMIT=1
 
-# lets you emit .out files.
-# CAN_EMIT=1
+# look in here for the stackless tests.
+OUR_START = staff-start.S
 
 EXCLUDE ?= grep -v simple_boot
+# GREP_STR := 'TRACE:\|THREAD:\|ERROR:\|PANIC:'
+
 GREP_STR := 'TRACE:\|SUCCESS:\|ERROR:\|PANIC:'
+
 include $(CS140E_2025_PATH)/libpi/mk/Makefile.robust
+
+# START_ASM = staff-start.S
 # include $(CS140E_2025_PATH)/libpi/mk/Makefile.template-fixed
+
+checkoff:
+	make -f ./checkoff.mk
+
+# Added this for randomm support
+LIB_POST += $(CS140E_2025_PATH)/lib/libgcc.a

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.S": "arm",
+        "random": "c",
+        "full-except.h": "c"
+    }
+}

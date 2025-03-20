@@ -20,7 +20,7 @@ void brkpt_mismatch_start(void);
 // set mismatch on <addr>:
 //  - set bvr0=<addr>
 //  - set bcr0 (including enable). 
-void brkpt_mismatch_set(uint32_t addr);
+void brkpt_mismatch_set(unsigned addr);
 
 // is it a breakpoint fault?
 //   1. was a debug instruction fault (use ifsr)
@@ -36,7 +36,7 @@ int brkpt_fault_p(void);
 // pc?  if match, then it's us.
 // is mismatch: 
 void brkpt_match_start(void);
-void brkpt_match_set(uint32_t addr);
+void brkpt_match_set(unsigned addr);
 void brkpt_match_stop(void);
 
 #endif

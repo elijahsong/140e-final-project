@@ -11,13 +11,14 @@
 // interrupt/exception trampoline should save 
 // the registers in these locations.
 enum {
-    REGS_SP = 13,
-    REGS_LR = 14,
-    REGS_PC = 15,
-    REGS_CPSR = 16,
     REGS_R0 = 0,
     REGS_R1 = 1,
     REGS_R2 = 2,
+
+    REGS_SP = 13,
+    REGS_LR = 14,
+    REGS_PC = 15,
+    REGS_CPSR = 16
 };
 
 // we keep things in a struct for some partial type checking.

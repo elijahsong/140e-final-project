@@ -1,0 +1,5 @@
+my-install  ./pt-tests/1-test-basic-tutorial.bin
+name: /dev/cu.usbserial-210, time: 1742442798
+my-install  ./pt-tests/1-test-one-addr.bin
+name: /dev/cu.usbserial-210, time: 1742442808
+my-install  ./pt-tests/1-test-two-addr.bin
