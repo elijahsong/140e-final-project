@@ -382,6 +382,7 @@ static void equiv_single_step_handler(regs_t *regs) {
     // we need to translate the virtual address to its corresponding
     // physical address using the page table
     if (!vm_xlate(&pa, identity_mapped_pt, va)) {
+        output("DEBUG: Failed to translate VA=%x\n", va);
         panic("Invalid virtual address translation");
     }
 
@@ -516,22 +517,22 @@ static int equiv_syscall_handler(regs_t *r) {
     not_reached();
 }
 
-// Function to set up identity-mapped virtual memory
-void setup_identity_mapping() {
-    // Allocate a page table with 4096 entries
-    identity_mapped_pt = vm_pt_alloc(4096);
+// // Function to set up identity-mapped virtual memory
+// void setup_identity_mapping() {
+//     // Allocate a page table with 4096 entries
+//     identity_mapped_pt = vm_pt_alloc(4096);
 
-    // Initialize MMU 
-    vm_mmu_init(DOM_client);  // DOM client because we need to allow read/write access for user-mode processes          
+//     // Initialize MMU 
+//     vm_mmu_init(DOM_client);  // DOM client because we need to allow read/write access for user-mode processes          
 
-    // Map all sections with identity mapping
-    for (uint32_t addr = 0; addr < MAX_MEM; addr += OneMB) {
-        vm_map_sec(identity_mapped_pt, addr, addr, pin_mk_global(DOM_client, perm_rw_priv, MEM_uncached));
-    }
+//     // Map all sections with identity mapping
+//     for (uint32_t addr = 0; addr < MAX_MEM; addr += OneMB) {
+//         vm_map_sec(identity_mapped_pt, addr, addr, pin_mk_global(DOM_client, perm_rw_priv, MEM_uncached));
+//     }
 
-    // Switch to the new page table
-    vm_mmu_switch(identity_mapped_pt, 0x140e, 1);  
-}
+//     // Switch to the new page table
+//     vm_mmu_switch(identity_mapped_pt, 0x140e, 1);  
+// }
 
 // not sure if we want to just have two seperate
 // functions for this init or just one...
@@ -553,10 +554,11 @@ void eqx_init_w_vm(void) {
     full_except_set_syscall(equiv_syscall_handler);
 
     // setup identity-mapped vm
-    setup_identity_mapping();
+    procmap_t p = procmap_default_mk(dom_kern);
 
-    //enable mmu
-    vm_mmu_enable();
+    trace("about to enable\n");
+    identity_mapped_pt = vm_map_kernel(&p,1);
+
 }
 
 

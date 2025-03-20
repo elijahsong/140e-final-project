@@ -39,7 +39,8 @@ void reg_dump(uint32_t tid, uint32_t cnt, regs_t *r, interleave_opt_t opt, int x
 int simple_interleave_check(checker_config_t c) {
     uint32_t N = c.n_copies;
     assert(N > 0);
-    eqx_init();
+    // eqx_init();
+    eqx_init_w_vm();
 
     // Run A then B in sequential mode (one after another)
     scheduler_config_t s;
