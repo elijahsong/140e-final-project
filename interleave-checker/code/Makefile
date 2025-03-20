@@ -3,7 +3,7 @@
 
 
 # ====== Run all new tests =====
-PROGS := $(wildcard new-tests/[1234567]*.c)
+# PROGS := $(wildcard new-tests/[1234567]*.c)
 # PROGS += $(wildcard new-tests/[1]*.c)  # basic test
 # PROGS += $(wildcard new-tests/[2]*.c)  # nop1 test
 # PROGS += $(wildcard new-tests/[3]*.c)  # nop10 test
@@ -11,6 +11,7 @@ PROGS := $(wildcard new-tests/[1234567]*.c)
 # PROGS += $(wildcard new-tests/[5]*.c)  # no-stack-interleaved-five test
 # PROGS += $(wildcard new-tests/[6]*.c)  # no-stack-interleaved-three test
 # PROGS += $(wildcard new-tests/[7]*.c)  # stack-interleaved test
+PROGS += $(wildcard new-tests/[8]*.c)   # memory reordering test
 
 # ==== Lab 15/17 Page Table VM Tests ====
 # PROGS := $(wildcard pt-tests/[1234]-*c)
