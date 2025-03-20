@@ -44,7 +44,7 @@ static int eqx_init_p = 0;
 static vm_pt_t *identity_mapped_pt = NULL;
 
 static int verbose_p = 1;
-enum { OneMB = 1024*1024, MAX_MEM = OneMB * 128 };
+enum { OneMB = 1024*1024, MAX_MEM = OneMB };
 void eqx_verbose(int v_p) {
     verbose_p = v_p;
 }

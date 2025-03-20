@@ -1341,35 +1341,35 @@ Disassembly of section .text:
     9334:	e3a00001 	mov	r0, #1, 0
     9338:	eb000874 	bl	b510 <vm_mmu_init>
     933c:	e3a04000 	mov	r4, #0, 0
-    9340:	e374037e 	cmn	r4, #-134217727	; 0xf8000001
-    9344:	8a000013 	bhi	9398 <setup_identity_mapping+0x7c>
-    9348:	e3a0c001 	mov	ip, #1, 0
-    934c:	e3a03000 	mov	r3, #0, 0
-    9350:	e58d3018 	str	r3, [sp, #24]
-    9354:	e58dc01c 	str	ip, [sp, #28]
-    9358:	e3a03003 	mov	r3, #3, 0
-    935c:	e58d3020 	str	r3, [sp, #32]
-    9360:	e5cdc024 	strb	ip, [sp, #36]	; 0x24
-    9364:	e3a03004 	mov	r3, #4, 0
-    9368:	e5cd3025 	strb	r3, [sp, #37]	; 0x25
-    936c:	e28d3028 	add	r3, sp, #40, 0	; 0x28
-    9370:	e913000f 	ldmdb	r3, {r0, r1, r2, r3}
-    9374:	e88d000f 	stm	sp, {r0, r1, r2, r3}
-    9378:	e1a0300c 	mov	r3, ip
-    937c:	e1a02004 	mov	r2, r4
-    9380:	e1a01004 	mov	r1, r4
-    9384:	e59f0028 	ldr	r0, [pc, #40]	; 93b4 <setup_identity_mapping+0x98>
-    9388:	e5900010 	ldr	r0, [r0, #16]
-    938c:	eb000865 	bl	b528 <vm_map_sec>
-    9390:	e2844601 	add	r4, r4, #1048576	; 0x100000
-    9394:	eaffffe9 	b	9340 <setup_identity_mapping+0x24>
-    9398:	e3a02001 	mov	r2, #1, 0
-    939c:	e59f1014 	ldr	r1, [pc, #20]	; 93b8 <setup_identity_mapping+0x9c>
-    93a0:	e59f300c 	ldr	r3, [pc, #12]	; 93b4 <setup_identity_mapping+0x98>
-    93a4:	e5930010 	ldr	r0, [r3, #16]
-    93a8:	eb000842 	bl	b4b8 <vm_mmu_switch>
-    93ac:	e28dd028 	add	sp, sp, #40, 0	; 0x28
-    93b0:	e8bd8010 	pop	{r4, pc}
+    9340:	e3540601 	cmp	r4, #1048576	; 0x100000
+    9344:	3a000006 	bcc	9364 <setup_identity_mapping+0x48>
+    9348:	e3a02001 	mov	r2, #1, 0
+    934c:	e59f1064 	ldr	r1, [pc, #100]	; 93b8 <setup_identity_mapping+0x9c>
+    9350:	e59f305c 	ldr	r3, [pc, #92]	; 93b4 <setup_identity_mapping+0x98>
+    9354:	e5930010 	ldr	r0, [r3, #16]
+    9358:	eb000856 	bl	b4b8 <vm_mmu_switch>
+    935c:	e28dd028 	add	sp, sp, #40, 0	; 0x28
+    9360:	e8bd8010 	pop	{r4, pc}
+    9364:	e3a0c001 	mov	ip, #1, 0
+    9368:	e3a03000 	mov	r3, #0, 0
+    936c:	e58d3018 	str	r3, [sp, #24]
+    9370:	e58dc01c 	str	ip, [sp, #28]
+    9374:	e3a03003 	mov	r3, #3, 0
+    9378:	e58d3020 	str	r3, [sp, #32]
+    937c:	e5cdc024 	strb	ip, [sp, #36]	; 0x24
+    9380:	e3a03004 	mov	r3, #4, 0
+    9384:	e5cd3025 	strb	r3, [sp, #37]	; 0x25
+    9388:	e28d3028 	add	r3, sp, #40, 0	; 0x28
+    938c:	e913000f 	ldmdb	r3, {r0, r1, r2, r3}
+    9390:	e88d000f 	stm	sp, {r0, r1, r2, r3}
+    9394:	e1a0300c 	mov	r3, ip
+    9398:	e1a02004 	mov	r2, r4
+    939c:	e1a01004 	mov	r1, r4
+    93a0:	e59f000c 	ldr	r0, [pc, #12]	; 93b4 <setup_identity_mapping+0x98>
+    93a4:	e5900010 	ldr	r0, [r0, #16]
+    93a8:	eb00085e 	bl	b528 <vm_map_sec>
+    93ac:	e2844601 	add	r4, r4, #1048576	; 0x100000
+    93b0:	eaffffe2 	b	9340 <setup_identity_mapping+0x24>
     93b4:	0000ef7c 	.word	0x0000ef7c
     93b8:	0000140e 	.word	0x0000140e
 
