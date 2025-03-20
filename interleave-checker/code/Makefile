@@ -12,7 +12,8 @@
 # PROGS += $(wildcard new-tests/[6]*.c)  # no-stack-interleaved-three test
 # PROGS += $(wildcard new-tests/[7]*.c)  # stack-interleaved test
 # PROGS += $(wildcard new-tests/[8]*.c)   # memory reordering test
-PROGS += $(wildcard new-tests/[9]*.c)  
+# PROGS += $(wildcard new-tests/[9]*.c)  
+PROGS += new-tests/10-deterministic-arithmetic.c
 
 # ==== Lab 15/17 Page Table VM Tests ====
 # PROGS := $(wildcard pt-tests/[1234]-*c)
