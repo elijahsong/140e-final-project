@@ -3,8 +3,11 @@
 
 
 # ====== Run all new tests =====
-PROGS := $(wildcard new-tests/[01234567]*.c)
-
+# PROGS := $(wildcard new-tests/[01234567]*.c)
+# PROGS += new-tests/1-mov-test-mod.c
+# PROGS += new-tests/1-nop1-test-mod.c
+# PROGS += new-tests/1-nop10-test-mod.c
+PROGS += new-tests/2-mov-ident-small1-test.c
 
 # ==== Lab 15/17 Page Table VM Tests ====
 # PROGS := $(wildcard pt-tests/[1234]-*c)
@@ -29,9 +32,6 @@ PROGS := $(wildcard new-tests/[01234567]*.c)
 
 # PROGS += tests/1-nop10-test.c
 # PROGS += new-tests/1-nop10-test-mod.c
-
-
-# PROGS += new-tests/2-mini-test.c
 
 # # very simple tests. start here.
 # PROGS += tests/0-nop1-test.c

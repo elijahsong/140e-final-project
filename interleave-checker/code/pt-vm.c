@@ -146,6 +146,9 @@ vm_pte_t * vm_lookup(vm_pt_t *pt, uint32_t va) {
 vm_pte_t *vm_xlate(uint32_t *pa, vm_pt_t *pt, uint32_t va) {
     unsigned index = va >> 20; 
     vm_pte_t *e = &pt[index];
+    if (!e) {
+        output("PTE is NULL");
+    }
     if (!e || e->tag != 0b10) {
         return 0;
     }

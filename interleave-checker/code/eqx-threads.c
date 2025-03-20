@@ -43,7 +43,7 @@ static int eqx_init_p = 0;
 
 static int vm_enabled = 0;
 
-static vm_pt_t *identity_mapped_pt = NULL;
+static vm_pt_t *pt = NULL;
 
 static int verbose_p = 1;
 enum { OneMB = 1024*1024, MAX_MEM = OneMB };
@@ -377,20 +377,23 @@ static void equiv_single_step_handler(regs_t *regs) {
     let th = cur_thread;
     assert(th);
 
-    // vm stuff
-    uint32_t va = regs->regs[REGS_PC];  // Get the virtual address of PC
-    uint32_t pa;
+    // // vm stuff
+    // uint32_t va = regs->regs[REGS_PC];  // Get the virtual address of PC
+    // uint32_t pa;
 
-    // we need to translate the virtual address to its corresponding
-    // physical address using the page table
-    if (vm_enabled && !vm_xlate(&pa, identity_mapped_pt, va)) {
-        output("DEBUG: Failed to translate VA=%x\n", va);
-        panic("Invalid virtual address translation");
-    }
+    // // we need to translate the virtual address to its corresponding
+    // // physical address using the page table
+    // if (vm_enabled && !vm_xlate(&pa, pt, va)) {
+    //     output("DEBUG: Failed to translate VA=%x\n", va);
+    //     panic("Invalid virtual address translation");
+    // } else {
+    //     output("translated VA=%x -> PA=%x\n", va, pa);
+    // }
 
-    // Update PC to physical address if needed for hash
-    if (vm_enabled)
-        regs->regs[REGS_PC] = pa;  
+    // // Update PC to physical address if needed for hash
+    // if (vm_enabled) {
+    //     regs->regs[REGS_PC] = pa;  
+    // }
 
     // copy the saved registers <regs> into thread the
     // <th>'s register block.
@@ -424,8 +427,7 @@ static void equiv_single_step_handler(regs_t *regs) {
     // should let them turn it off.
     if(th->verbose_p) {
         if (vm_enabled) {
-            output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n",
-                th->tid, th->inst_cnt, pa, th->reg_hash);
+            // output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n", th->tid, th->inst_cnt, pa, th->reg_hash);
         } else {
             uint32_t pc = regs->regs[15];
             output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n",
@@ -434,8 +436,9 @@ static void equiv_single_step_handler(regs_t *regs) {
     }
         
     // vm
-    if (vm_enabled)
-        regs->regs[REGS_PC] = va;  
+    // if (vm_enabled) {
+    //     regs->regs[REGS_PC] = va;
+    // }
     eqx_schedule();
 }
 
@@ -529,7 +532,7 @@ void eqx_init_w_vm(void) {
     if(eqx_init_p)
         panic("called init twice!\n");
     eqx_init_p = 1;
-    kmalloc_init_set_start((void*)MB(1), MB(1));
+    kmalloc_init_set_start((void*)MB(1), MB(2));
 
     // install is idempotent if already there.
     full_except_install(0);
@@ -540,13 +543,50 @@ void eqx_init_w_vm(void) {
     // for system calls (like many labs)
     full_except_set_syscall(equiv_syscall_handler);
 
-    // setup identity-mapped vm
-    procmap_t p = procmap_default_mk(dom_kern);
+    pin_t dev  = pin_mk_global(dom_kern, no_user, MEM_device);
+    // kernel memory: same, but is only uncached.
+    pin_t kern = pin_mk_global(dom_kern, no_user, MEM_uncached);
 
-    trace("about to enable\n");
-    identity_mapped_pt = vm_map_kernel(&p, 1);
+    pt = vm_pt_alloc(PT_LEVEL1_N);
+    vm_mmu_init(~0);
+    assert(!mmu_is_enabled());
+
+    vm_map_sec(pt, SEG_CODE, SEG_CODE, kern);
+    vm_map_sec(pt, SEG_HEAP, SEG_HEAP, kern);
+    vm_map_sec(pt, SEG_STACK, SEG_STACK, kern);
+    vm_map_sec(pt, SEG_INT_STACK, SEG_INT_STACK, kern);
+    vm_map_sec(pt, SEG_BCM_0, SEG_BCM_0, dev);
+    vm_map_sec(pt, SEG_BCM_1, SEG_BCM_1, dev);
+    vm_map_sec(pt, SEG_BCM_2, SEG_BCM_2, dev);
+
+    //****************************************************
+    // 2. create a single user entry:
+
+
+    // for today: user entry attributes are:
+    //  - non-global
+    //  - user dom
+    //  - user r/w permissions. 
+    // for this test:
+    //  - also uncached (like kernel)
+    //  - ASID = 1
+    enum { ASID = 1 };
+    pin_t usr = pin_mk_user(dom_user, ASID, user_access, MEM_uncached);
+    
+    // identity map 16th MB for r/w
+    enum { 
+        user_va_addr = MB(1),
+        user_pa_addr = MB(2),
+    };
+    vm_map_sec(pt, user_va_addr, user_pa_addr, usr);
+    
+    vm_mmu_switch(pt,0x140e,ASID);
+
+    // make sure no helper enabled by mistake
+    assert(!mmu_is_enabled());
+    vm_mmu_enable();
     assert(mmu_is_enabled());
-
+    output("VM is enabled!\n");
     vm_enabled = 1;
 }
 

@@ -13,7 +13,8 @@ void notmain(void) {
         .n_copies = 19,
         .enable_stack = 0,
         .max_num_inst = 1000,
-        .verbosity = 0
+        .verbosity = 0,
+        .enable_vm = 1
     };
     int res = simple_interleave_check(c);
 }

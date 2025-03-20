@@ -29,6 +29,7 @@ typedef struct checker_config {
     int enable_stack;
     int max_num_inst;
     int verbosity;
+    int enable_vm;
 } checker_config_t;
 
 // Run the function A interleaved with `n_copies` of B 
