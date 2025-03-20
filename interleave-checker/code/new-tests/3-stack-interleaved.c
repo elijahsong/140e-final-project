@@ -18,14 +18,14 @@ void msg(void *msg) {
 }
 
 void notmain(void) {
-    eqx_init();
     interleave_opt_t opt = {
         .enable_stack = 1,
         .max_num_inst = 2000,
         .verbosity = 0,
         .interleave_verbosity = 1,
         .non_interleave_type = SEQUENTIAL,
-        .random_seed = 12
+        .random_seed = 12,
+        .enable_vm = 1
     };
 
     void (*fcns[])(void *) = {hello, msg, msg};

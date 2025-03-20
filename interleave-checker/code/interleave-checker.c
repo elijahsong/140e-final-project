@@ -210,8 +210,13 @@ int interleave_x_with_others(int x, int sequential_hash, void (**funcArr)(void *
     return n_errors;
 }
 
-// NOTE: Must call eqx_init() before
 int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, interleave_opt_t opt) {
+    if (opt.enable_vm) {
+        eqx_init_w_vm();
+    } else {
+        eqx_init();
+    }    
+
     eqx_th_t *ths[n_fns];
     scheduler_config_t s;
     eqx_verbose(opt.verbosity);

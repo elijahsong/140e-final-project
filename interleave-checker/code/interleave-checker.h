@@ -18,6 +18,7 @@ typedef struct interleave_opt {
     uint32_t random_seed; // Required if RANDOM enabled
     char **fnames;
     int enable_fnames;
+    int enable_vm;
 } interleave_opt_t;
 
 typedef struct checker_config {

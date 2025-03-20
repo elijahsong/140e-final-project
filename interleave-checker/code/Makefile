@@ -7,7 +7,10 @@
 # PROGS += new-tests/1-mov-test-mod.c
 # PROGS += new-tests/1-nop1-test-mod.c
 # PROGS += new-tests/1-nop10-test-mod.c
-PROGS += new-tests/2-mov-ident-small1-test.c
+# PROGS += new-tests/2-mov-ident-small1-test.c
+# PROGS += new-tests/2-no-stack-interleaved-three.c
+# PROGS += new-tests/2-no-stack-interleaved-five.c
+PROGS += new-tests/3-stack-interleaved.c
 
 # ==== Lab 15/17 Page Table VM Tests ====
 # PROGS := $(wildcard pt-tests/[1234]-*c)
