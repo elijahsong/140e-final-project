@@ -41,6 +41,8 @@ static int thread_x_has_yielded = 0;
 // check for initialization bugs.
 static int eqx_init_p = 0;
 
+static int vm_enabled = 0;
+
 static vm_pt_t *identity_mapped_pt = NULL;
 
 static int verbose_p = 1;
@@ -381,13 +383,14 @@ static void equiv_single_step_handler(regs_t *regs) {
 
     // we need to translate the virtual address to its corresponding
     // physical address using the page table
-    if (!vm_xlate(&pa, identity_mapped_pt, va)) {
+    if (vm_enabled && !vm_xlate(&pa, identity_mapped_pt, va)) {
         output("DEBUG: Failed to translate VA=%x\n", va);
         panic("Invalid virtual address translation");
     }
 
-    // Update PC to physical address if needed
-    regs->regs[REGS_PC] = pa;  
+    // Update PC to physical address if needed for hash
+    if (vm_enabled)
+        regs->regs[REGS_PC] = pa;  
 
     // copy the saved registers <regs> into thread the
     // <th>'s register block.
@@ -406,7 +409,6 @@ static void equiv_single_step_handler(regs_t *regs) {
     // }
 
     // DONT WANT THIS FOR VM
-    // uint32_t pc = regs->regs[15]; 
 
     // need to do so it relabels the cpsr: 
     //  if(cpsr.mode!=x)
@@ -420,16 +422,20 @@ static void equiv_single_step_handler(regs_t *regs) {
     th->reg_hash = fast_hash_inc32(&th->regs, sizeof th->regs, th->reg_hash);
 
     // should let them turn it off.
-    // if(th->verbose_p)
-    //     output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n",
-    //         th->tid, th->inst_cnt, pc, th->reg_hash);
-
-
+    if(th->verbose_p) {
+        if (vm_enabled) {
+            output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n",
+                th->tid, th->inst_cnt, pa, th->reg_hash);
+        } else {
+            uint32_t pc = regs->regs[15];
+            output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n",
+                th->tid, th->inst_cnt, pc, th->reg_hash);
+        }
+    }
+        
     // vm
-    if(th->verbose_p)
-        output("hash: tid=%d: cnt=%d: pc=%x, hash=%x\n",
-            th->tid, th->inst_cnt, pa, th->reg_hash);
-
+    if (vm_enabled)
+        regs->regs[REGS_PC] = va;  
     eqx_schedule();
 }
 
@@ -517,36 +523,17 @@ static int equiv_syscall_handler(regs_t *r) {
     not_reached();
 }
 
-// // Function to set up identity-mapped virtual memory
-// void setup_identity_mapping() {
-//     // Allocate a page table with 4096 entries
-//     identity_mapped_pt = vm_pt_alloc(4096);
-
-//     // Initialize MMU 
-//     vm_mmu_init(DOM_client);  // DOM client because we need to allow read/write access for user-mode processes          
-
-//     // Map all sections with identity mapping
-//     for (uint32_t addr = 0; addr < MAX_MEM; addr += OneMB) {
-//         vm_map_sec(identity_mapped_pt, addr, addr, pin_mk_global(DOM_client, perm_rw_priv, MEM_uncached));
-//     }
-
-//     // Switch to the new page table
-//     vm_mmu_switch(identity_mapped_pt, 0x140e, 1);  
-// }
-
 // not sure if we want to just have two seperate
 // functions for this init or just one...
 void eqx_init_w_vm(void) {
     if(eqx_init_p)
         panic("called init twice!\n");
     eqx_init_p = 1;
-
-    // bad form for us to do this.   for today...
-    if(!kmalloc_heap_start())
-        kmalloc_init(1);
+    kmalloc_init_set_start((void*)MB(1), MB(1));
 
     // install is idempotent if already there.
     full_except_install(0);
+    assert(!mmu_is_enabled());
 
     // for breakpoint handling (like lab 10)
     full_except_set_prefetch(equiv_single_step_handler);
@@ -557,12 +544,11 @@ void eqx_init_w_vm(void) {
     procmap_t p = procmap_default_mk(dom_kern);
 
     trace("about to enable\n");
-    identity_mapped_pt = vm_map_kernel(&p,1);
+    identity_mapped_pt = vm_map_kernel(&p, 1);
+    assert(mmu_is_enabled());
 
+    vm_enabled = 1;
 }
-
-
-
 
 // one time initialization.  
 //  - setup heap if haven't.

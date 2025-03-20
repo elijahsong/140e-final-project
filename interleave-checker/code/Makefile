@@ -45,7 +45,8 @@ PROGS := $(wildcard new-tests/[01234567]*.c)
 # we give you these files code.  you can start tweaking them
 # when pass the tests.
 COMMON_SRC += eqx-threads.c
-COMMON_SRC += breakpoint.c
+# COMMON_SRC += breakpoint.c
+STAFF_OBJS += staff-breakpoint.o
 COMMON_SRC += staff-full-except.c
 
 COMMON_SRC += interleave-checker.c
