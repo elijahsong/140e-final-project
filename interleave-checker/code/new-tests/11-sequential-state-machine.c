@@ -30,8 +30,8 @@ void notmain(void) {
         .verbosity = 1,
         .non_interleave_type = RANDOM,
         .random_seed = 789,
-        .enable_vm = 0,
-        .enable_all_caches = 0
+        .enable_vm = 1,
+        .enable_all_caches = 1
     };
 
     void (*functions[])(void *) = {transition_1, transition_2, transition_3, transition_4, transition_5};
