@@ -19,6 +19,7 @@ typedef struct interleave_opt {
     char **fnames;
     int enable_fnames;
     int enable_vm;
+    int enable_all_caches;
 } interleave_opt_t;
 
 typedef struct checker_config {
@@ -31,6 +32,7 @@ typedef struct checker_config {
     int max_num_inst;
     int verbosity;
     int enable_vm;
+    int enable_all_caches;
 } checker_config_t;
 
 // Run the function A interleaved with `n_copies` of B 

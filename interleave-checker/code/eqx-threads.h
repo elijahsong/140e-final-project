@@ -53,7 +53,7 @@ typedef struct eqx_th {
 // a very heavy handed initialization just for today's lab.
 // assumes it has total control of system calls etc.
 void eqx_init(void);
-void eqx_init_w_vm(void);
+void eqx_init_w_vm(int enable_all_caches);
 
 int thread_x_completed_before_yielding(void);
 

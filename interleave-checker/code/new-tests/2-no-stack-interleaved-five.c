@@ -8,11 +8,12 @@ void notmain(void) {
     interleave_opt_t opt = {
         .enable_stack = 0,
         .max_num_inst = 2000,
-        .verbosity = 0,
+        .verbosity = 1,
         .non_interleave_type = RANDOM,
         .random_seed = 12,
         .enable_fnames = 0,
-        .enable_vm = 0
+        .enable_vm = 1,
+        .enable_all_caches = 1
     };
 
     // run all together: interleaving all 5 threads.

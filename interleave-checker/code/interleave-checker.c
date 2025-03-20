@@ -41,7 +41,7 @@ int simple_interleave_check(checker_config_t c) {
     assert(N > 0);
 
     if (c.enable_vm) {
-        eqx_init_w_vm();
+        eqx_init_w_vm(c.enable_all_caches);
     } else {
         eqx_init();
     }    
@@ -212,7 +212,7 @@ int interleave_x_with_others(int x, int sequential_hash, void (**funcArr)(void *
 
 int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, interleave_opt_t opt) {
     if (opt.enable_vm) {
-        eqx_init_w_vm();
+        eqx_init_w_vm(opt.enable_all_caches);
     } else {
         eqx_init();
     }    
@@ -241,8 +241,6 @@ int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, interl
     //     }
     // }
 
-    output("Sequential hash: %x\n\n", hash);
-
     // We will interleave A with B, C, D
     // Then B with A, C, D
     // Then C with A, B, D, etc.    
@@ -251,6 +249,7 @@ int interleave_multiple(void (**funcArr)(void *), void **args, int n_fns, interl
         int n_errors = interleave_x_with_others(i, hash, funcArr, args, n_fns, opt, ths);
         output("Ran X[idx=%d] interleaved, found %d errors.\n\n", i, n_errors);
     }
+    output("Sequential hash: %x\n\n", hash);
 
     return 1;
 }

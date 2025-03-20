@@ -17,7 +17,7 @@ objs/eqx-threads.o: eqx-threads.c \
  fast-hash32.h eqx-syscalls.h pt-vm.h mem-attr.h mmu.h armv6-cp15.h \
  armv6-vm.h procmap.h pinned-vm.h memmap-default.h \
  /Users/ElijahSong/Documents/cs140e-25win//libpi/include/memmap.h \
- queue-ext-T.h
+ cache-support.h queue-ext-T.h
 
 /Users/ElijahSong/Documents/cs140e-25win//libpi/include/rpi.h:
 
@@ -72,5 +72,7 @@ pinned-vm.h:
 memmap-default.h:
 
 /Users/ElijahSong/Documents/cs140e-25win//libpi/include/memmap.h:
+
+cache-support.h:
 
 queue-ext-T.h:

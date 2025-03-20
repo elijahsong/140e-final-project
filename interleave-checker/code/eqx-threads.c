@@ -31,6 +31,7 @@
 #include "cpsr-util.h"
 
 #include "pt-vm.h"
+#include "cache-support.h"
 
 
 // in INTERLEAVE_X mode, whether thread X ended up completing fully 
@@ -528,7 +529,7 @@ static int equiv_syscall_handler(regs_t *r) {
 
 // not sure if we want to just have two seperate
 // functions for this init or just one...
-void eqx_init_w_vm(void) {
+void eqx_init_w_vm(int enable_all_caches) {
     if(eqx_init_p)
         panic("called init twice!\n");
     eqx_init_p = 1;
@@ -586,7 +587,16 @@ void eqx_init_w_vm(void) {
     assert(!mmu_is_enabled());
     vm_mmu_enable();
     assert(mmu_is_enabled());
-    output("VM is enabled!\n");
+
+    // Enable all caches
+    if (enable_all_caches) {
+        caches_all_on();
+        assert(caches_all_on_p()); }
+    // } else {
+    //     caches_all_off();
+    // }
+
+    output("VM is enabled w/ all caches enabled=%d!\n", caches_all_on_p());
     vm_enabled = 1;
 }
 

@@ -25,7 +25,8 @@ void notmain(void) {
         .interleave_verbosity = 1,
         .non_interleave_type = SEQUENTIAL,
         .random_seed = 12,
-        .enable_vm = 1
+        .enable_vm = 1,
+        .enable_all_caches = 1
     };
 
     void (*fcns[])(void *) = {hello, msg, msg};

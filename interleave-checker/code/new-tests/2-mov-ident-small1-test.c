@@ -16,7 +16,8 @@ void notmain(void) {
         .enable_stack = 0,
         .max_num_inst = 10,
         .verbosity = 0,
-        .enable_vm = 1
+        .enable_vm = 0,
+        .enable_all_caches = 0
     };
     int res = simple_interleave_check(c);
     output("success !!!\n");

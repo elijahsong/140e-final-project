@@ -12,7 +12,8 @@ void notmain(void) {
         .non_interleave_type = RANDOM,
         .random_seed = 12,
         .enable_fnames = 0,
-        .enable_vm = 0
+        .enable_vm = 1,
+        .enable_all_caches = 1
     };
 
     // Run `nop1`, `nop10`, `mov_ident`
